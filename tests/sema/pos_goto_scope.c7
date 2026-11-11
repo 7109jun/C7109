@@ -1,0 +1,63 @@
+void use(i32 x) { }
+i32 id(i32 x) { return x; }
+
+void forward_without_declarations() {
+    i32 a = 1;
+    if (id(a) == 1) { goto skip; }
+    use(a);
+    skip:
+    use(0);
+}
+
+void declaration_after_the_label() {
+    mut i32 n = 0;
+    top:
+    i32 fresh = n;               // declared after the label: jumping back to it is fine
+    n += 1;
+    if (n < 3) { goto top; }
+    use(fresh);
+}
+
+void leave_nested_scopes() {
+    i32 a = 1;
+    {
+        i32 b = 2;
+        {
+            i32 c = 3;
+            if (id(c) == 3) { goto done; }
+            use(b);
+        }
+    }
+    done:
+    use(a);
+}
+
+void into_block_before_its_declarations() {
+    if (id(1) == 1) { goto inside; }
+    {
+        inside:
+        i32 late = 4;            // declared after the label
+        use(late);
+    }
+}
+
+void out_of_loop() {
+    for (k in 0..5) {
+        if (k == 2) { goto after; }
+        use(k);
+    }
+    after:
+    use(9);
+}
+
+void defer_is_fine_when_not_skipped() {
+    top:
+    defer { use(1); }            // label before the defer: jumping back to it is fine
+    if (id(2) == 3) { goto top; }
+    {
+        defer { use(2); }
+        if (id(1) == 1) { goto leave; }   // leaving a scope that has a defer
+    }
+    leave:
+    use(3);
+}

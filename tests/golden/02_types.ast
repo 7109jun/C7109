@@ -1,0 +1,434 @@
+Unit `tests/cases/02_types.c7`
+  Struct `Vec4`
+    Attribute `repr(C)`
+    Attribute `align(16)`
+    Var `x`
+      TypePrim `f32`
+    Var `y`
+      TypePrim `f32`
+    Var `z`
+      TypePrim `f32`
+    Var `w`
+      TypePrim `f32`
+  Struct `Point`
+    Var `x`
+      TypePrim `f32`
+    Var `y`
+      TypePrim `f32`
+  Struct `Flags`
+    Attribute `packed`
+    Var `enabled`
+      TypePrim `u8`
+      Empty `bits`
+        IntLit `1`
+    Var `mode`
+      TypePrim `u8`
+      Empty `bits`
+        IntLit `3`
+    Var `reserved`
+      TypePrim `u8`
+      Empty `bits`
+        IntLit `4`
+  Union `Bits`
+    Var `f`
+      TypePrim `f32`
+    Var `u`
+      TypePrim `u32`
+  Enum `Color`
+    TypePrim `u8`
+    Enumerator `Red`
+      IntLit `1`
+    Enumerator `Green`
+    Enumerator `Blue`
+  Tagged `Token`
+    TypePrim `u8`
+    Variant `Number`
+      Param `value`
+        TypePrim `i64`
+    Variant `Ident`
+      Param `name`
+        TypeName `Str`
+    Variant `Plus`
+    Variant `Minus`
+  Tagged `Event`
+    Attribute `repr(C)`
+    TypePrim `u32`
+    Variant `Key`
+      Param `code`
+        TypePrim `u32`
+    Variant `Click`
+      Param `x`
+        TypePrim `i32`
+      Param `y`
+        TypePrim `i32`
+  Tagged `Result`
+    GenericParams
+      GenericParam `T`
+      GenericParam `E`
+    Variant `Ok`
+      Param `value`
+        TypeName `T`
+    Variant `Err`
+      Param `error`
+        TypeName `E`
+  Alias `Size`
+    TypePrim `usize`
+  Class `Counter`
+    Var `value` [priv mut]
+      TypePrim `i32`
+    Init [pub]
+      Param `start`
+        TypePrim `i32`
+      Block
+        AssignOrDecl `=`
+          Path `value`
+          Path `start`
+    Drop [pub]
+      Block
+    Func `get` [pub]
+      TypePrim `i32`
+      Block
+        Return
+          Path `value`
+    Func `add` [pub mut]
+      TypePrim `void`
+      Param `n`
+        TypePrim `i32`
+      Block
+        Assign `+=`
+          Path `value`
+          Path `n`
+    Func `zero` [pub static]
+      TypeName `Counter`
+      Block
+        Return
+          Call
+            Path `Counter`
+            IntLit `0`
+  Interface `Shape`
+    Func `area`
+      TypePrim `f64`
+    Func `scale` [mut]
+      TypePrim `void`
+      Param `k`
+        TypePrim `f64`
+  Interface `Ord`
+    TypeName `Eq`
+    TypeName `Hashable`
+    Func `compare`
+      TypePrim `i32`
+      Param `other`
+        TypePtr
+          TypeConst
+            TypeName `Self`
+  Struct `Circle`
+    Var `r`
+      TypePrim `f64`
+  Impl [for]
+    TypeName `Shape`
+    TypeName `Circle`
+    Func `area`
+      TypePrim `f64`
+      Block
+        Return
+          Binary `*`
+            Binary `*`
+              FloatLit `3.14159`
+              Path `r`
+            Path `r`
+    Func `scale` [mut]
+      TypePrim `void`
+      Param `k`
+        TypePrim `f64`
+      Block
+        AssignOrDecl `=`
+          Path `r`
+          Binary `*`
+            Path `r`
+            Path `k`
+  Struct `Vec`
+    GenericParams
+      GenericParam `T`
+    Var `data` [mut]
+      TypePtr
+        TypeName `T`
+    Var `len` [mut]
+      TypePrim `usize`
+    Var `cap` [mut]
+      TypePrim `usize`
+  Impl
+    GenericParams
+      GenericParam `T`
+    TypeName `Vec`
+      TypeArgs
+        TypeName `T`
+    Func `push` [pub mut]
+      TypeName `Result`
+        TypeArgs
+          TypePrim `void`
+          TypeName `AllocError`
+      Param `value`
+        TypeName `T`
+      Block
+        Return
+          Call
+            Path `Ok`
+            IntLit `0`
+    Func `size` [pub]
+      TypePrim `usize`
+      Block
+        Return
+          Path `len`
+  Func `max`
+    TypeName `T`
+    GenericParams
+      GenericParam `T`
+        TypeName `Comparable`
+    Param `a`
+      TypeName `T`
+    Param `b`
+      TypeName `T`
+    Block
+      Return
+        Ternary
+          Binary `>=`
+            Call
+              Member `compare`
+                Path `a`
+              Unary `&`
+                Path `b`
+            IntLit `0`
+          Path `a`
+          Path `b`
+  Func `dot`
+    Attribute `specialize(f32, f64)`
+    TypeName `T`
+    GenericParams
+      GenericParam `T`
+        TypeName `Numeric`
+    Param `a`
+      TypeSlice
+        TypeConst
+          TypeName `T`
+    Param `b`
+      TypeSlice
+        TypeConst
+          TypeName `T`
+    Block
+      Var `acc` [mut]
+        TypeName `T`
+        Call
+          Path `T::zero`
+      ForIn `i`
+        Range `..`
+          IntLit `0`
+          Member `len`
+            Path `a`
+        Block
+          Assign `+=`
+            Path `acc`
+            Binary `*`
+              Index
+                Path `a`
+                Path `i`
+              Index
+                Path `b`
+                Path `i`
+      Return
+        Path `acc`
+  Func `operator+`
+    TypeName `Vec2`
+    Param `a`
+      TypeName `Vec2`
+    Param `b`
+      TypeName `Vec2`
+    Block
+      Return
+        StructLit
+          Path `Vec2`
+          FieldInit
+            Binary `+`
+              Member `x`
+                Path `a`
+              Member `x`
+                Path `b`
+          FieldInit
+            Binary `+`
+              Member `y`
+                Path `a`
+              Member `y`
+                Path `b`
+  Func `operator==`
+    TypePrim `bool`
+    Param `a`
+      TypeName `Vec2`
+    Param `b`
+      TypeName `Vec2`
+    Block
+      Return
+        Binary `&&`
+          Binary `==`
+            Member `x`
+              Path `a`
+            Member `x`
+              Path `b`
+          Binary `==`
+            Member `y`
+              Path `a`
+            Member `y`
+              Path `b`
+  Func `Vec2::operator[]`
+    TypePtr
+      TypePrim `f32`
+    Param `i`
+      TypePrim `usize`
+    Block
+      Return
+        Ternary
+          Binary `==`
+            Path `i`
+            IntLit `0`
+          Unary `&`
+            Path `x`
+          Unary `&`
+            Path `y`
+  Func `closures`
+    TypePrim `void`
+    Block
+      Var `total` [mut]
+        TypePrim `i32`
+        IntLit `0`
+      Var `base`
+        TypePrim `i32`
+        IntLit `10`
+      Var `add`
+        TypeClosure
+          TypePrim `i32`
+          TypePrim `void`
+        Lambda
+          Param `x`
+            TypePrim `i32`
+          TypePrim `void`
+          Block
+            Assign `+=`
+              Path `total`
+              Binary `+`
+                Path `x`
+                Path `base`
+      Var `add2`
+        TypeClosure
+          TypePrim `i32`
+          TypePrim `void`
+        Lambda
+          Capture `base`
+          Capture `total` [&]
+          Param `x`
+            TypePrim `i32`
+          TypePrim `void`
+          Block
+            Assign `+=`
+              Path `total`
+              Binary `+`
+                Path `x`
+                Path `base`
+      Var `all`
+        TypeClosure
+          TypePrim `void`
+        Lambda
+          Capture `=`
+          TypePrim `void`
+          Block
+      Var `fp`
+        TypeFn
+          TypePrim `i32`
+          TypePrim `i32`
+        Path `twice`
+      ExprStmt
+        Call
+          Path `add`
+          IntLit `1`
+  Func `make_counter`
+    TypeClosure
+      TypePrim `void`
+    Param `start` [mut]
+      TypePrim `i32`
+    Block
+      Return
+        Lambda [heap]
+          Capture `start`
+          TypePrim `void`
+          Block
+  Func `use_generics`
+    TypePrim `void`
+    Block
+      Var `m`
+        TypePrim `i32`
+        Call
+          Path `max`
+          IntLit `3`
+          IntLit `5`
+      Var `f`
+        TypePrim `f64`
+        Call
+          Path `max`
+            TypeArgs
+              TypePrim `f64`
+          FloatLit `1.0`
+          FloatLit `2.0`
+      Var `v`
+        TypeName `Vec`
+          TypeArgs
+            TypePrim `i32`
+        Call
+          Path `Vec::init`
+            TypeArgs
+              TypePrim `i32`
+      Var `vv`
+        TypeName `Vec`
+          TypeArgs
+            TypeName `Vec`
+              TypeArgs
+                TypePrim `i32`
+        Call
+          Path `Vec::init`
+            TypeArgs
+              TypeName `Vec`
+                TypeArgs
+                  TypePrim `i32`
+      Var `p`
+        TypeName `Point`
+        StructLit
+          Path `Point`
+          FieldInit `x`
+            FloatLit `1.0`
+          FieldInit `y`
+            FloatLit `2.0`
+      Var `q`
+        TypeName `Point`
+        StructLit
+          Path `Point`
+          FieldInit
+            FloatLit `3.0`
+          FieldInit
+            FloatLit `4.0`
+      Var `b`
+        TypeName `Bits`
+        StructLit
+          Path `Bits`
+          FieldInit `f`
+            FloatLit `1.0`
+      Var `c`
+        TypeName `Color`
+        Path `Color::Green`
+      Var `a`
+        TypePrim `f64`
+        Call
+          Arrow `area`
+            Path `s`
+      Var `raw`
+        TypePtr
+          TypePrim `void`
+        Cast
+          Path `s`
+          TypePtr
+            TypePrim `void`

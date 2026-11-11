@@ -1,0 +1,11 @@
+// E. 24-byte struct (three registers under swiftcc, memory under C/fastcc) passed and returned by value.
+extern "C" { void c7_print_i64(i64 v); void c7_newline(); }
+struct T { i64 a; i64 b; i64 c; }
+T step(T x, T y) { return T{ x.a + y.c, x.b + y.b, x.c + y.a }; }
+T rec(i32 n) {
+    if (n < 2) { return T{ n as i64, 1, 2 }; }
+    T x = rec(n - 1);
+    T y = rec(n - 2);
+    return step(x, y);
+}
+i32 main() { T r = rec(39); c7_print_i64((r.a + r.b + r.c) % 1000003); c7_newline(); return 0; }

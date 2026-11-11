@@ -1,0 +1,19 @@
+#include "05_pp.h7"
+#include "05_pp.h7"
+#define N 4
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define LOG(fmt, ...) log_msg(fmt, __VA_ARGS__)
+#if defined(__C7_OS_LINUX__) && __C7109_VERSION__ >= 10000
+i32 on_linux() { return SQUARE(N); }
+#elif defined(__C7_OS_WINDOWS__)
+i32 on_windows() { return 0; }
+#else
+#error unsupported OS
+#endif
+#ifdef UNDEFINED_THING
+this is skipped entirely @@@
+#endif
+#if __has_include("05_pp.h7") && !defined(MISSING)
+i32 has_it() { return MAX(1, 2); }
+#endif
+void use() { LOG("x=%d", N); i32 line = __LINE__; }

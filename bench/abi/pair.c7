@@ -1,0 +1,11 @@
+// B. small struct (16 bytes, two registers) passed AND returned by value.
+extern "C" { void c7_print_i64(i64 v); void c7_newline(); }
+struct P { i64 a; i64 b; }
+P step(P x, P y) { return P{ x.a + y.b, x.b + y.a }; }
+P rec(i32 n) {
+    if (n < 2) { return P{ n as i64, 1 }; }
+    P x = rec(n - 1);
+    P y = rec(n - 2);
+    return step(x, y);
+}
+i32 main() { P r = rec(40); c7_print_i64(r.a % 1000003); c7_newline(); return 0; }

@@ -1,0 +1,15 @@
+// F. Result<Str, E> (a realistic 24-byte return) propagated with `try`.
+extern "C" { void c7_print_i64(i64 v); void c7_newline(); }
+struct E { i32 code; }
+Result<Str, E> pick(i32 n) {
+    if (n < 0) { return Err(E{ code: 1 }); }
+    if (n < 2) { return Ok("leaf"); }
+    Str a = try pick(n - 1);
+    Str b = try pick(n - 2);
+    if (a.len >= b.len) { return Ok(a); }
+    return Ok(b);
+}
+i32 main() {
+    match (pick(39)) { Ok(s) => { c7_print_i64(s.len as i64); c7_newline(); } Err(e) => { return 1; } }
+    return 0;
+}

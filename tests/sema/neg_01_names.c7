@@ -1,0 +1,12 @@
+// expect: E0212
+// expect: E0213
+// expect: E0211
+// expect: E0214
+void f() {
+    i32 a = undefined_name;
+    Unknown u = 1;
+    i32 b = 1;
+    i32 b = 2;
+}
+struct P { i32 x; }
+void g(P p) { i32 q = p.nope; }

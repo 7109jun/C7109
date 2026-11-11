@@ -1,0 +1,11 @@
+// expect: E0102
+// expect: E0104
+// expect: E0101
+// expect: E0105
+void f(i32 x) {
+    if (x = 1) { }
+    i32 y = ;
+    while (x < 3 { }
+    return
+}
+void 123();

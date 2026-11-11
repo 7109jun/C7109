@@ -1,0 +1,11 @@
+// expect: E0650
+struct NoHash { i32 x; }
+
+void unbounded<T>(T x) { mut HashMap<T, i32> m = HashMap<T, i32>(); }
+
+i32 main() {
+    mut HashMap<NoHash, i32> a = HashMap<NoHash, i32>();   // annotated type
+    b = HashMap<NoHash, i32>();                            // constructor path only
+    unbounded(1);
+    return 0;
+}

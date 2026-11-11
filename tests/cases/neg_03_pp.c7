@@ -1,0 +1,8 @@
+// expect: E0601
+// expect: E0603
+// expect: E0605
+// expect: E0602
+#include "does_not_exist.h7"
+#error custom failure
+#else
+#bogus

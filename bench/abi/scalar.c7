@@ -1,0 +1,4 @@
+// A. scalar recursion: i32 argument, i64 return (no aggregates).
+extern "C" { void c7_print_i64(i64 v); void c7_newline(); }
+i64 fib(i32 n) { if (n < 2) { return n as i64; } return fib(n - 1) + fib(n - 2); }
+i32 main() { c7_print_i64(fib(40)); c7_newline(); return 0; }

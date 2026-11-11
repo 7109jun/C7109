@@ -1,0 +1,408 @@
+Unit `tests/cases/01_basic.c7`
+  Namespace `app::main`
+  Import `std::io`
+  Import `std::collections::Vec`
+    Path `List`
+  Import `mylib::util` [glob]
+  Import `stdio.h` [c]
+  Func `add`
+    TypePrim `i32`
+    Param `a`
+      TypePrim `i32`
+    Param `b`
+      TypePrim `i32`
+    Block
+      Return
+        Binary `+`
+          Path `a`
+          Path `b`
+  Func `log_line`
+    TypePrim `void`
+    Param `msg`
+      TypeName `Str`
+  Func `sum`
+    TypePrim `i32`
+    Param `xs`
+      TypeSlice
+        TypeConst
+          TypePrim `i32`
+    Block
+      Var `total` [mut]
+        TypePrim `i32`
+        IntLit `0`
+      ForIn `x`
+        Path `xs`
+        Block
+          Assign `+=`
+            Path `total`
+            Path `x`
+      Return
+        Path `total`
+  Func `vars`
+    TypePrim `void`
+    Block
+      Var `a`
+        TypePrim `i32`
+        IntLit `10`
+      Var `value` [mut]
+        TypePrim `i32`
+        IntLit `10`
+      AssignOrDecl `=`
+        Path `value`
+        Binary `+`
+          Path `value`
+          IntLit `1`
+      Var `count` [mut]
+        IntLit `0`
+      AssignOrDecl `=`
+        Path `limit`
+        IntLit `100u64`
+      AssignOrDecl `=`
+        Path `name`
+        StrLit `c7`
+      Var `buf` [mut]
+        TypeArray
+          TypePrim `u8`
+          IntLit `4096`
+        Undefined
+      Var `arr`
+        TypeArray
+          TypePrim `i32`
+          IntLit `4`
+        InitList
+          IntLit `1`
+          IntLit `2`
+          IntLit `3`
+          IntLit `4`
+      Var `s`
+        TypeSlice
+          TypePrim `i32`
+        Index
+          Path `arr`
+          Range `..`
+            Empty
+            Empty
+      Var `t`
+        TypeSlice
+          TypePrim `i32`
+        Index
+          Path `arr`
+          Range `..`
+            IntLit `1`
+            IntLit `3`
+      Var `n`
+        TypePrim `usize`
+        Member `len`
+          Path `s`
+      Var `big`
+        TypePrim `i64`
+        IntLit `5_000_000_000`
+      Var `small`
+        TypePrim `i32`
+        Cast
+          Path `big`
+          TypePrim `i32`
+      Var `pi`
+        TypePrim `f64`
+        FloatLit `3.14159`
+      Var `k`
+        TypePrim `i32`
+        Cast
+          Path `pi`
+          TypePrim `i32`
+      Var `c`
+        TypePrim `u8`
+        Cast
+          IntLit `300`
+          TypePrim `u8`
+      Var `addr`
+        TypePrim `usize`
+        Cast
+          Unary `&`
+            Path `big`
+          TypePrim `usize`
+      Var `raw`
+        TypePtr
+          TypePrim `void`
+        Cast
+          Path `addr`
+          TypePtr
+            TypePrim `void`
+      Var `m`
+        TypePrim `i32`
+        Binary `-`
+          Cast
+            Path `ch`
+            TypePrim `i32`
+          Cast
+            CharLit `'0'`
+            TypePrim `i32`
+      Var `x`
+        TypePrim `i32`
+        Binary `+`
+          Binary `+`
+            Binary `+`
+              IntLit `0xFF`
+              IntLit `0b1010`
+            IntLit `0o17`
+          IntLit `1_000`
+      Var `f`
+        TypePrim `f32`
+        FloatLit `1.5e-3f32`
+      Var `ch2`
+        TypePrim `Char`
+        CharLit `'\u{1F600}'`
+      Var `greeting`
+        TypeName `Str`
+        StrLit `안녕, 
+세계`
+      Var `cs`
+        TypeName `CStr`
+        CStrLit `hello`
+      Var `rawp`
+        TypeName `Str`
+        RawStrLit `C:\path`
+      Var `sh`
+        TypePrim `i32`
+        Binary `>>`
+          Binary `<<`
+            IntLit `1`
+            IntLit `3`
+          IntLit `1`
+      Var `mix`
+        TypePrim `i32`
+        Ternary
+          Binary `==`
+            Binary `&`
+              Path `a`
+              IntLit `3`
+            IntLit `3`
+          IntLit `1`
+          IntLit `2`
+      Var `y` [mut]
+        TypePrim `i32`
+        IntLit `8`
+      Assign `>>=`
+        Path `y`
+        IntLit `1`
+      Assign `<<=`
+        Path `y`
+        IntLit `2`
+      TupleDecl
+        Path `q`
+        Path `ok`
+        Call
+          Path `divide`
+          IntLit `10`
+          IntLit `3`
+      TupleDecl
+        Path `r` [mut]
+        Path `flag` [mut]
+        Call
+          Path `divide`
+          IntLit `9`
+          IntLit `3`
+  Func `ptrs`
+    TypePrim `void`
+    Block
+      Var `x`
+        TypePrim `i32`
+        IntLit `5`
+      Var `y` [mut]
+        TypePrim `i32`
+        IntLit `6`
+      Var `p1`
+        TypePtr
+          TypeConst
+            TypePrim `i32`
+        Unary `&`
+          Path `x`
+      Var `p2` [mut]
+        TypePtr
+          TypeConst
+            TypePrim `i32`
+        Unary `&`
+          Path `x`
+      Var `p3`
+        TypePtr
+          TypePrim `i32`
+        Unary `&`
+          Path `y`
+      Var `p4` [mut]
+        TypePtr
+          TypePrim `i32`
+        Unary `&`
+          Path `y`
+      Assign `=`
+        Unary `*`
+          Path `p4`
+        IntLit `7`
+      Var `shapes`
+        TypeSlice
+          TypePtr
+            TypeName `Shape`
+  Func `flow`
+    TypePrim `void`
+    Param `n`
+      TypePrim `i32`
+    Param `code`
+      TypePrim `i32`
+    Block
+      If
+        Binary `>`
+          Path `n`
+          IntLit `0`
+        Block
+          ExprStmt
+            Call
+              Path `f`
+        If
+          Binary `<`
+            Path `n`
+            IntLit `0`
+          Block
+            ExprStmt
+              Call
+                Path `g`
+          Block
+            ExprStmt
+              Call
+                Path `h`
+      Var `i` [mut]
+        TypePrim `i32`
+        IntLit `0`
+      While
+        Binary `<`
+          Path `i`
+          IntLit `10`
+        Block
+          Assign `+=`
+            Path `i`
+            IntLit `1`
+      DoWhile
+        Block
+          Assign `-=`
+            Path `i`
+            IntLit `1`
+        Binary `>`
+          Path `i`
+          IntLit `0`
+      For
+        Var `j` [mut]
+          TypePrim `i32`
+          IntLit `0`
+        Binary `<`
+          Path `j`
+          Path `n`
+        Assign `+=`
+          Path `j`
+          IntLit `1`
+        Block
+          Continue
+      ForIn `j`
+        Range `..`
+          IntLit `0`
+          Path `n`
+        Block
+      ForIn `j`
+        Range `..=`
+          IntLit `0`
+          Path `n`
+        Block
+      ForIn `ch`
+        Call
+          Member `chars`
+            Path `text`
+        Block
+      Switch
+        Path `code`
+        Case
+          IntLit `1`
+          IntLit `2`
+          IntLit `3`
+          Body
+            ExprStmt
+              Call
+                Path `handle_small`
+            Break
+        Case
+          Range `..=`
+            IntLit `4`
+            IntLit `9`
+          Body
+            ExprStmt
+              Call
+                Path `handle_mid`
+            Break
+        Default
+          Body
+            ExprStmt
+              Call
+                Path `handle_other`
+      Label `outer`
+        ForIn `y`
+          Range `..`
+            IntLit `0`
+            Path `h`
+          Block
+            ForIn `x`
+              Range `..`
+                IntLit `0`
+                Path `w`
+              Block
+                If
+                  Binary `==`
+                    Index
+                      Index
+                        Path `grid`
+                        Path `y`
+                      Path `x`
+                    Path `target`
+                  Block
+                    Break `outer`
+      Goto `done`
+      Label `done`
+        Return
+  Func `add_arrays`
+    TypePrim `void`
+    Param `dst` [noalias mut]
+      TypePtr
+        TypePrim `f32`
+    Param `a` [noalias]
+      TypePtr
+        TypeConst
+          TypePrim `f32`
+    Param `b` [noalias]
+      TypePtr
+        TypeConst
+          TypePrim `f32`
+    Param `n`
+      TypePrim `usize`
+    Block
+      For
+        Var `i` [mut]
+          TypePrim `usize`
+          IntLit `0`
+        Binary `<`
+          Path `i`
+          Path `n`
+        Assign `+=`
+          Path `i`
+          IntLit `1`
+        Block
+          Assign `=`
+            Index
+              Path `dst`
+              Path `i`
+            Binary `+`
+              Index
+                Path `a`
+                Path `i`
+              Index
+                Path `b`
+                Path `i`
+  Func `main`
+    TypePrim `i32`
+    Block
+      Return
+        IntLit `0`

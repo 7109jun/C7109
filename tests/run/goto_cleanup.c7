@@ -1,0 +1,65 @@
+extern "C" { void c7_print_i64(i64 v); void c7_newline(); }
+void say(i64 v) { c7_print_i64(v); c7_newline(); }
+class Res {
+    priv i32 id;
+    pub init(i32 i) { id = i; }
+    pub drop() { say(id as i64); }
+}
+i32 id(i32 x) { return x; }
+
+// forward goto out of three nested scopes: innermost first, defer and drop in reverse registration order
+void leave_nested() {
+    Res a = Res(1);
+    {
+        Res b = Res(2);
+        defer { say(20); }
+        {
+            Res c = Res(3);
+            if (id(1) == 1) { goto done; }
+            say(99);
+        }
+        say(98);
+    }
+    done:
+    say(100);
+}
+
+// backward goto: a variable declared after the label is destroyed on every jump
+void backward() {
+    mut i32 n = 0;
+    top:
+    Res r = Res(10 + n);
+    n += 1;
+    if (n < 3) { goto top; }
+    say(200);
+}
+
+// goto out of a loop body runs that iteration's defer
+void out_of_loop() {
+    mut i32 i = 0;
+    while (i < 5) {
+        defer { say(30); }
+        if (i == 2) { goto after; }
+        i += 1;
+    }
+    after:
+    say(300);
+}
+
+// nothing to clean up: plain jump
+i32 plain() {
+    mut i32 s = 0;
+    s += 1;
+    goto skip;
+    s += 100;
+    skip:
+    return s;
+}
+
+i32 main() {
+    say(-1); leave_nested();
+    say(-2); backward();
+    say(-3); out_of_loop();
+    say(-4); say(plain() as i64);
+    return 0;
+}

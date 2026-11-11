@@ -1,0 +1,33 @@
+{
+ "abi": "c7abi1",
+ "architecture": "x86_64",
+ "bounds_check": true,
+ "debug_alloc": true,
+ "flags": [
+  "-O1",
+  "--debug",
+  "-fbounds-check",
+  "-fdebug-alloc",
+  "--link=static",
+  "--lang=ko",
+  "--target=x86_64-linux",
+  "-Iinc",
+  "-Ivendor/inc"
+ ],
+ "include": [
+  "inc",
+  "vendor/inc"
+ ],
+ "language": "ko",
+ "library": [
+  "lib"
+ ],
+ "link": "static",
+ "mode": "debug",
+ "optimization": "O1",
+ "os": "linux",
+ "overflow_check": true,
+ "registry": [
+  "../reg"
+ ]
+}

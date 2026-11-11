@@ -1,0 +1,2 @@
+[paths]
+library = ["a", 1]

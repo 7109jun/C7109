@@ -1,0 +1,10 @@
+// expect: E0610
+struct A { i32 x; }
+struct B { i32 y; }
+
+Result<i32, A> f() { return Ok(1); }
+
+Result<i32, B> g() {
+    i32 v = try f();   // no conversion from A to B
+    return Ok(v);
+}

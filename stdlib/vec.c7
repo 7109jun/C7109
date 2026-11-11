@@ -1,0 +1,44 @@
+// std vec: growable array. T is never held by value in an aggregate (shared-code generics), only through T*.
+namespace std;
+
+class Vec<T> {
+    priv mut T* data;
+    priv mut usize len;
+    priv mut usize cap;
+
+    pub init() { data = null; len = 0; cap = 0; }
+    pub drop() { if (data != null) { free[] data; } }
+
+    pub usize size() { return len; }
+    pub usize capacity() { return cap; }
+
+    pub mut Result<void, AllocError> push(T value) {
+        if (len == cap) {
+            mut usize ncap = cap * 2;
+            if (ncap < 4) { ncap = 4; }
+            mut T* nd = alloc T[ncap];
+            if (nd == null) { return Err(AllocError::OutOfMemory); }
+            for (i in 0..len) { nd[i] = data[i]; }
+            if (data != null) { free[] data; }
+            data = nd;
+            cap = ncap;
+        }
+        data[len] = value;
+        len += 1;
+        return Ok();
+    }
+
+    pub mut bool pop(out T item) {
+        if (len == 0) { return false; }
+        len -= 1;
+        item = data[len];
+        return true;
+    }
+
+    pub T* at(usize i) {
+        assert(i < len, "Vec index out of range");
+        return &data[i];
+    }
+
+    pub mut void clear() { len = 0; }
+}

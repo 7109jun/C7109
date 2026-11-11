@@ -1,0 +1,50 @@
+extern "C" {
+    void c7_print_i64(i64 v);
+    void c7_newline();
+}
+void pi(i64 v) { c7_print_i64(v); c7_newline(); }
+
+i32 main() {
+    mut HashMap<i32, i64> m = HashMap<i32, i64>();
+    pi(m.size() as i64);
+    for (i in 0..1000) { m.put(i, (i as i64) * 7); }
+    pi(m.size() as i64);
+    mut i64 sum = 0;
+    for (i in 0..1000) {
+        i32 k = i;
+        i64* p = m.get(&k);
+        if (p == null) { return 1; }
+        sum += *p;
+    }
+    pi(sum);                                  // 7 * (0+...+999)
+    i32 missing = 5000;
+    pi(m.contains(&missing) ? 1 : 0);
+    m.put(10, 1);                             // overwrite
+    i32 ten = 10;
+    pi(*m.get(&ten));
+    pi(m.size() as i64);
+    mut i32 r = 0;
+    for (i in 0..500) { r = i * 2; if (!m.remove(&r)) { return 2; } }
+    pi(m.size() as i64);
+    pi(m.remove(&r) ? 1 : 0);                 // already removed
+    for (i in 0..500) { m.put(100000 + i, 1); }   // reuse deleted slots
+    pi(m.size() as i64);
+    i32 odd = 999;
+    pi(*m.get(&odd));
+    i32 even = 998;
+    pi(m.contains(&even) ? 1 : 0);
+
+    mut HashMap<Str, i32> words = HashMap<Str, i32>();
+    words.put("apple", 1);
+    words.put("banana", 2);
+    words.put("cherry", 3);
+    words.put("apple", 10);
+    Str kb = "banana";
+    Str kx = "durian";
+    pi(words.size() as i64);
+    pi(*words.get(&kb) as i64);
+    Str ka = "apple";
+    pi(*words.get(&ka) as i64);
+    pi(words.contains(&kx) ? 1 : 0);
+    return 0;
+}

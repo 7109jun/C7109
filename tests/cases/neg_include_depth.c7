@@ -1,0 +1,2 @@
+// expect: E0613
+#include "neg_include_depth.c7"

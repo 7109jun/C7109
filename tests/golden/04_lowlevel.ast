@@ -1,0 +1,245 @@
+Unit `tests/cases/04_lowlevel.c7`
+  ExternBlock `C`
+    Func `puts`
+      TypeName `CInt`
+      Param `s`
+        TypeName `CStr`
+    Func `malloc`
+      TypePtr
+        TypePrim `void`
+      Param `n`
+        TypeName `CSize`
+  Func `c7_add` [extern:C]
+    Attribute `export`
+    TypeName `CInt`
+    Param `a`
+      TypeName `CInt`
+    Param `b`
+      TypeName `CInt`
+    Block
+      Return
+        Binary `+`
+          Path `a`
+          Path `b`
+  Func `on_event` [extern:system]
+    Attribute `export`
+    TypeName `CInt`
+    Param `code`
+      TypeName `CInt`
+    Block
+      Return
+        IntLit `0`
+  Func `on_panic`
+    Attribute `panic_handler`
+    Attribute `noreturn`
+    TypePrim `void`
+    Param `msg`
+      TypeName `Str`
+    Block
+      ExprStmt
+        Call
+          Path `hw::serial_write`
+          IntLit `0x3F8`
+          Path `msg`
+      For
+        Empty
+        Empty
+        Empty
+        Block
+          ExprStmt
+            Call
+              Path `cpu::halt`
+  Func `kernel_main`
+    Attribute `entry`
+    Attribute `noreturn`
+    TypePrim `void`
+    Block
+  Struct `UartRegs`
+    Var `data` [volatile]
+      TypePrim `u32`
+    Var `status` [volatile]
+      TypePrim `u32`
+  Func `uart_putc`
+    TypePrim `void`
+    Param `uart`
+      TypePtr
+        TypeName `UartRegs`
+    Param `ch`
+      TypePrim `u8`
+    Block
+      While
+        Binary `==`
+          Binary `&`
+            Arrow `status`
+              Path `uart`
+            IntLit `0x20`
+          IntLit `0`
+        Block
+          ExprStmt
+            Call
+              Path `cpu::pause`
+      Assign `=`
+        Arrow `data`
+          Path `uart`
+        Cast
+          Path `ch`
+          TypePrim `u32`
+  Func `timer_handler`
+    Attribute `interrupt`
+    TypePrim `void`
+    Param `frame`
+      TypePtr
+        TypeName `InterruptFrame`
+    Block
+      Assign `+=`
+        Path `ticks`
+        IntLit `1`
+      ExprStmt
+        Call
+          Path `pic_eoi`
+          IntLit `0`
+  Func `simd`
+    TypePrim `void`
+    Block
+      Var `a`
+        TypeName `V4f32`
+        Call
+          Path `V4f32::splat`
+          FloatLit `1.0`
+      Var `b`
+        TypeName `V4f32`
+        StructLit
+          Path `V4f32`
+          FieldInit
+            FloatLit `1.0`
+          FieldInit
+            FloatLit `2.0`
+          FieldInit
+            FloatLit `3.0`
+          FieldInit
+            FloatLit `4.0`
+      Var `c`
+        TypeName `V4f32`
+        Binary `+`
+          Path `a`
+          Binary `*`
+            Path `b`
+            Path `a`
+      Var `s`
+        TypePrim `f32`
+        Call
+          Path `simd::reduce_add`
+          Path `c`
+      If
+        Call
+          Path `cpu::has`
+          Path `Feature::Avx2`
+        Block
+  Func `saxpy`
+    Attribute `multiversion(avx512f, avx2, sse4_2, default)`
+    TypePrim `void`
+    Param `a`
+      TypePrim `f32`
+    Param `x`
+      TypeSlice
+        TypeConst
+          TypePrim `f32`
+    Param `y`
+      TypeSlice
+        TypePrim `f32`
+    Block
+      ForIn `i`
+        Range `..`
+          IntLit `0`
+          Member `len`
+            Path `x`
+        Block
+          Assign `=`
+            Index
+              Path `y`
+              Path `i`
+            Binary `+`
+              Binary `*`
+                Path `a`
+                Index
+                  Path `x`
+                  Path `i`
+              Index
+                Path `y`
+                Path `i`
+  Func `fast`
+    Attribute `target_feature("avx2")`
+    TypePrim `void`
+    Block
+  Enum `MemoryOrder`
+    Enumerator `Relaxed`
+    Enumerator `Acquire`
+    Enumerator `Release`
+    Enumerator `AcqRel`
+    Enumerator `SeqCst`
+  Var `counter`
+    TypeName `Atomic`
+      TypeArgs
+        TypePrim `u32`
+    Call
+      Path `Atomic::init`
+        TypeArgs
+          TypePrim `u32`
+      IntLit `0`
+  Var `errno_value` [thread_local mut]
+    TypePrim `i32`
+    IntLit `0`
+  Func `hit`
+    TypePrim `void`
+    Block
+      ExprStmt
+        Call
+          Member `fetch_add`
+            Path `counter`
+          IntLit `1`
+          Path `MemoryOrder::Relaxed`
+  Func `try_lock`
+    TypePrim `bool`
+    Param `flag`
+      TypePtr
+        TypeName `Atomic`
+          TypeArgs
+            TypePrim `u32`
+    Block
+      Var `expected` [mut]
+        TypePrim `u32`
+        IntLit `0`
+      Return
+        Call
+          Arrow `compare_exchange`
+            Path `flag`
+          OutArg
+            Path `expected`
+          IntLit `1`
+          Path `MemoryOrder::Acquire`
+          Path `MemoryOrder::Relaxed`
+  Func `add_works`
+    Attribute `test`
+    TypePrim `void`
+    Block
+      ExprStmt
+        Call
+          Path `std::test::assert_eq`
+          Call
+            Path `add`
+            IntLit `2`
+            IntLit `3`
+          IntLit `5`
+  Func `c_interop`
+    TypePrim `void`
+    Block
+      ExprStmt
+        Call
+          Path `c::puts`
+          CStrLit `hello`
+      Var `wide` [mut]
+        TypePrim `i128`
+        IntLit `1i128`
+      Var `uw`
+        TypePrim `u128`
+        IntLit `340282366920938463463374607431768211455u128`

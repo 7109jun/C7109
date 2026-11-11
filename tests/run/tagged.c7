@@ -1,0 +1,64 @@
+extern "C" {
+    void c7_print_i64(i64 v);
+    void c7_print_str(CStr s);
+    void c7_newline();
+}
+void pi(i64 v) { c7_print_i64(v); c7_newline(); }
+void ps(CStr s) { c7_print_str(s); c7_newline(); }
+
+enum ParseError : u8 { Empty, BadDigit, Overflow }
+
+Result<i32, ParseError> parse_i32(Str s) {
+    if (s.len == 0) { return Err(ParseError::Empty); }
+    mut i32 acc = 0;
+    for (i in 0..s.len) {
+        u8 c = s[i];
+        if (c < 48 || c > 57) { return Err(ParseError::BadDigit); }
+        acc = acc * 10 + (c as i32 - 48);
+    }
+    return Ok(acc);
+}
+
+Result<i32, ParseError> sum_two(Str a, Str b) {
+    i32 x = try parse_i32(a);
+    i32 y = try parse_i32(b);
+    return Ok(x + y);
+}
+
+void show(Result<i32, ParseError> r) {
+    match (r) {
+        Ok(v) => { ps(c"ok"); pi(v); }
+        Err(e) => { ps(c"err"); pi(e as i64); }
+    }
+}
+
+tagged union Shape { Circle(f64 radius), Rect(f64 w, f64 h), Empty, }
+
+f64 area(Shape s) {
+    match (s) {
+        Circle(r) => return 3.0 * r * r;
+        Rect(w, h) => return w * h;
+        Empty => return 0.0;
+    }
+}
+
+Option<i32> find(i32[4] xs, i32 target) {
+    for (i in 0..4) { if (xs[i] == target) { return Some(i); } }
+    return None;
+}
+
+i32 main() {
+    show(parse_i32("123"));
+    show(parse_i32("12x"));
+    show(parse_i32(""));
+    show(sum_two("40", "2"));
+    show(sum_two("4", "x"));
+    pi(area(Shape::Rect(3.0, 4.0)) as i64);
+    pi(area(Shape::Circle(2.0)) as i64);
+    f64 e = area(Shape::Empty);
+    pi(e as i64);
+    i32[4] xs = {5, 6, 7, 8};
+    match (find(xs, 7)) { Some(i) => pi(i); None => ps(c"none"); }
+    match (find(xs, 9)) { Some(i) => pi(i); None => ps(c"none"); }
+    return 0;
+}

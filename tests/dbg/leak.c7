@@ -1,0 +1,11 @@
+extern "C" { void c7_print_i64(i64 v); void c7_newline(); }
+i32 main() {
+    mut i32* a = alloc i32;
+    mut i32* b = alloc i32[100];
+    mut Vec<i32>* v = alloc Vec<i32>();   // its buffer leaks too
+    v->push(1);
+    *a = 1;
+    free a;
+    c7_print_i64(42); c7_newline();
+    return 0;
+}

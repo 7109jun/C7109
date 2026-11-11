@@ -1,0 +1,11 @@
+a = """
+Roses are red
+Violets are blue"""
+b = """The quick brown \
+
+   fox jumps over \
+    the lazy dog."""
+c = """Here are two quotation marks: "". Simple enough."""
+d = """""\""" and more"""
+e = """
+first newline trimmed"""

@@ -1,0 +1,65 @@
+// Standard-library unit tests. Run with: c7c test tests/std/containers.c7 [-O2] [-fdebug-alloc]
+struct Pt { i32 x; i32 y; }
+
+@test
+void vec_push_pop() {
+    mut Vec<i32> v = Vec<i32>();
+    assert(v.size() == 0, "new vec is empty");
+    for (i in 0..100) { v.push(i); }
+    assert(v.size() == 100, "size after pushes");
+    assert(*v.at(42) == 42, "element 42");
+    mut i32 top = -1;
+    assert(v.pop(out top), "pop succeeds");
+    assert(top == 99, "popped last element");
+    assert(v.size() == 99, "size after pop");
+    v.clear();
+    assert(!v.pop(out top), "pop on empty fails");
+}
+
+@test
+void vec_struct_elements() {
+    mut Vec<Pt> v = Vec<Pt>();
+    for (i in 0..20) { v.push(Pt{ x: i, y: i * 2 }); }
+    assert(v.at(19)->y == 38, "struct element survives growth");
+}
+
+@test
+void arena_alignment_and_reset() {
+    mut Arena a = Arena(128);
+    mut u8* b = null;
+    mut i64* n = null;
+    assert(a.create(out b), "byte fits");
+    assert(a.create(out n), "i64 fits");
+    assert((n as usize) % 8 == 0, "i64 is 8-aligned");
+    assert(a.used() == 16, "used includes padding");
+    mut i64* big = null;
+    assert(!a.create_array(1000, out big), "oversized request fails");
+    assert(big == null, "failed request yields null");
+    a.reset();
+    assert(a.used() == 0, "reset rewinds");
+}
+
+@test
+void hashmap_put_get_remove() {
+    mut HashMap<i32, i32> m = HashMap<i32, i32>();
+    for (i in 0..500) { m.put(i, i + 1); }
+    assert(m.size() == 500, "size after puts");
+    i32 k = 250;
+    assert(*m.get(&k) == 251, "lookup");
+    assert(m.remove(&k), "remove existing");
+    assert(!m.contains(&k), "removed key is gone");
+    assert(m.size() == 499, "size after remove");
+    m.put(k, 7);
+    assert(*m.get(&k) == 7, "reinsert after remove");
+}
+
+@test
+void hashmap_str_keys() {
+    mut HashMap<Str, i32> m = HashMap<Str, i32>();
+    m.put("one", 1);
+    m.put("two", 2);
+    Str two = "two";
+    Str none = "none";
+    assert(*m.get(&two) == 2, "str lookup");
+    assert(m.get(&none) == null, "missing str key");
+}

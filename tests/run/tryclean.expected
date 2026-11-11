@@ -1,0 +1,10 @@
+drop 2
+cleanup
+drop 1
+8
+cleanup
+drop 1
+failed
+16
+12
+8

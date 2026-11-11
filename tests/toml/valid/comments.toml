@@ -1,0 +1,7 @@
+# leading comment
+
+a = 1 # trailing
+   # indented comment
+b = "x#y" # hash inside string
+
+

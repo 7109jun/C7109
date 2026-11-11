@@ -1,0 +1,6 @@
+// expect: E0614
+// expect: E0606
+#define CAT(a, b) a ## b
+#define BAD(x) # y
+#define EDGE(x) x ##
+i32 v = CAT(+, x);

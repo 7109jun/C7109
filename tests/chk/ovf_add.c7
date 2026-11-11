@@ -1,0 +1,10 @@
+extern "C" { void c7_print_i64(i64 v); void c7_newline(); }
+void pi(i64 v) { c7_print_i64(v); c7_newline(); }
+i32 id(i32 x) { return x; }
+i32 main() {
+    mut i32 x = id(2147483647);
+    pi(1);
+    x += 1;
+    pi(2);
+    return 0;
+}

@@ -1,0 +1,19 @@
+extern "C" { void c7_print_i64(i64 v); void c7_newline(); }
+void pi(i64 v) { c7_print_i64(v); c7_newline(); }
+i32 id(i32 x) { return x; }
+i64 idl(i64 x) { return x; }
+u64 idu(u64 x) { return x; }
+i32 main() {
+    i8 a = -128;                          // literal at the type's minimum is not an overflow
+    pi(a as i64);
+    i64 m = -9223372036854775808;
+    pi(m == idl(-9223372036854775808) ? 1 : 0);
+    i32 big = id(2147483647);
+    pi((big - 1 + 1) as i64);             // stays in range
+    u64 u = idu(18446744073709551615);
+    pi((u - 1 + 1 == u) ? 1 : 0);
+    pi((id(-2147483647) * 1) as i64);
+    pi((-id(2147483647)) as i64);
+    pi((id(46340) * id(46340)) as i64);   // 2147395600 fits in i32
+    return 0;
+}

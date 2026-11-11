@@ -1,0 +1,2 @@
+i32 zero() { return 0; }
+i32 main() { i32 x = 10 / zero(); return x; }

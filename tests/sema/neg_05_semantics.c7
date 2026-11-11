@@ -1,0 +1,36 @@
+// expect: E0480
+// expect: E0611
+// expect: E0612
+// expect: E0640
+// expect: E0641
+// expect: E0650
+// expect: E0631
+// expect: E0621
+// expect: E0217
+// expect: E0215
+// expect: E0214
+class H { init() { } drop() { } }
+void take(H h) { }
+void f1() { H a = H(); H b = a; }
+void f2() { H a = H(); take(a); }
+i32 g();
+void f3() { i32 x = try g(); }
+Result<i32, i32> r();
+void f4() { i32 x = try r(); }
+interface Shape { f64 area(); }
+struct Sq { f64 s; }
+impl Shape for Sq { }
+struct NotIface { }
+impl NotIface for Sq { }
+interface Ord { i32 cmp(); }
+T pick<T : Ord>(T a, T b) { return a; }
+void f6() { i32 z = pick(1, 2); }
+void ov2(i32 a) { }
+void ov2(Str s) { }
+void f7() { ov2(true); }
+class P { priv i32 secret; pub init() { secret = 1; } }
+void f8() { P p = P(); i32 s = p.secret; }
+struct S2 { i32 a; i32 b; }
+void f9() { S2 s = S2{ a: 1 }; }
+void f10() { S2 s = S2{ 1 }; }
+void f11() { S2 s = S2{ a: 1, b: 2, c: 3 }; }

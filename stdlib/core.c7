@@ -1,0 +1,35 @@
+// std core: runtime glue, panic/assert, printing. Written in C7; only libc/runtime symbols are extern.
+namespace std;
+
+extern "C" {
+    void c7_print_i64(i64 v);
+    void c7_print_u64(u64 v);
+    void c7_print_f64(f64 v);
+    void c7_print_char(i32 c);
+    void c7_write(const u8* p, usize n);
+    void c7_newline();
+    void c7_panic_str(const u8* p, usize n);
+    void* memcpy(void* dst, const void* src, usize n);
+    i32 memcmp(const void* a, const void* b, usize n);
+}
+
+@noreturn void panic(Str msg) { c7_panic_str(msg.ptr, msg.len); }
+
+void assert(bool cond, Str msg) {
+    if (!cond) { panic(msg); }
+}
+
+@noreturn void unreachable() { panic("unreachable code reached"); }
+
+T bitcopy<T>(T x) { return x; }
+
+void print(Str s) { c7_write(s.ptr, s.len); }
+void println(Str s) { c7_write(s.ptr, s.len); c7_newline(); }
+void print_i64(i64 v) { c7_print_i64(v); }
+void print_u64(u64 v) { c7_print_u64(v); }
+void print_f64(f64 v) { c7_print_f64(v); }
+void print_char(Char c) { c7_print_char(c as i32); }
+void print_bool(bool b) { if (b) { print("true"); } else { print("false"); } }
+void newline() { c7_newline(); }
+
+enum AllocError : u8 { OutOfMemory }

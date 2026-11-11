@@ -1,0 +1,33 @@
+extern "C" {
+    void c7_print_i64(i64 v);
+    void c7_print_str(CStr s);
+    void c7_newline();
+}
+
+i64 fib(i64 n) {
+    if (n < 2) { return n; }
+    return fib(n - 1) + fib(n - 2);
+}
+
+i64 sum_to(i64 n) {
+    mut i64 total = 0;
+    for (i in 0..=n) { total += i; }
+    return total;
+}
+
+i64 collatz_steps(i64 start) {
+    mut i64 n = start;
+    mut i64 steps = 0;
+    while (n != 1) {
+        if (n % 2 == 0) { n = n / 2; } else { n = 3 * n + 1; }
+        steps += 1;
+    }
+    return steps;
+}
+
+i32 main() {
+    c7_print_i64(fib(20)); c7_newline();
+    c7_print_i64(sum_to(100)); c7_newline();
+    c7_print_i64(collatz_steps(27)); c7_newline();
+    return 0;
+}

@@ -1,0 +1,13 @@
+// expect: E0410
+// expect: E0412
+// expect: E0229
+// expect: E0230
+// expect: E0450
+// expect: E0470
+i32 f1(i32 x) { if (x > 0) { return 1; } }
+void f2() { return 1; }
+void f3() { break; }
+void f4() { goto nowhere; }
+enum E : u8 { A, B, C }
+void f5(E e) { match (e) { A => return; B => return; } }
+void f6() { defer { return; } }

@@ -1,0 +1,14 @@
+// D. Result<i64, E> returned by value, propagated with `try`.
+extern "C" { void c7_print_i64(i64 v); void c7_newline(); }
+struct E { i32 code; }
+Result<i64, E> rf(i32 n) {
+    if (n < 0) { return Err(E{ code: 1 }); }
+    if (n < 2) { return Ok(n as i64); }
+    i64 a = try rf(n - 1);
+    i64 b = try rf(n - 2);
+    return Ok(a + b);
+}
+i32 main() {
+    match (rf(40)) { Ok(v) => { c7_print_i64(v); c7_newline(); } Err(e) => { return 1; } }
+    return 0;
+}

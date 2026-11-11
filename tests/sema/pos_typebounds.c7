@@ -1,0 +1,15 @@
+struct Key { i32 x; }
+impl Hashable for Key {
+    u64 hash() { return self->x as u64; }
+    bool eq(const Key* other) { return self->x == other->x; }
+}
+
+void bounded<T : Hashable>(T x) { mut HashMap<T, i32> m = HashMap<T, i32>(); }
+
+i32 main() {
+    mut HashMap<Key, i32> a = HashMap<Key, i32>();
+    mut HashMap<Str, i64> b = HashMap<Str, i64>();
+    bounded(1);
+    bounded(Key{ x: 2 });
+    return 0;
+}

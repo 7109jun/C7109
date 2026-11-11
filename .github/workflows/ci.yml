@@ -1,0 +1,106 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    name: Linux (x86-64) build + test
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y llvm gcc g++ make python3 unzip binutils
+          llc --version | head -3
+      - name: Build (warnings are errors in review; the tree builds with 0)
+        run: make
+      - name: Tests
+        run: make test
+      - name: Documentation examples
+        run: make doccheck
+      - name: Sanitizer sweep (ASan + UBSan) and fuzz
+        run: make asan
+      - name: Package
+        run: |
+          set -e
+          ver=$(./c7c --version | awk '{print $2}')
+          dir=c7109-$ver-linux-x86_64
+          mkdir -p "$dir/runtime" "$dir/docs"
+          cp c7c std.l7 "$dir/"
+          cp runtime/c7rt.c "$dir/runtime/"
+          cp -r docs/*.md "$dir/docs/"
+          cp README.md "$dir/" || true
+          tar czf "$dir.tar.gz" "$dir"
+          sha256sum "$dir.tar.gz" > "$dir.tar.gz.sha256"
+          echo "PKG=$dir.tar.gz" >> "$GITHUB_ENV"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: c7109-linux-x86_64
+          path: |
+            c7109-*-linux-x86_64.tar.gz
+            c7109-*-linux-x86_64.tar.gz.sha256
+
+  windows:
+    # EXPERIMENTAL. The compiler uses POSIX process/file APIs, so it is built inside MSYS2 (which provides them).
+    # Native Windows output (PE/COFF) is roadmap stage 7: c7c still generates x86-64 Linux programs only.
+    # The job never blocks the pipeline; read its log to see how far the port has come.
+    name: Windows (MSYS2, experimental)
+    runs-on: windows-2022
+    continue-on-error: true
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MSYS
+          update: true
+          install: >-
+            base-devel gcc make python unzip
+      - name: Build c7c
+        run: make c7c
+      - name: Smoke test
+        run: |
+          ./c7c --version
+          ./c7c parse tests/run/hello.c7 && echo "parse ok"
+          ./c7c check tests/sema/pos_01_basic.c7 && echo "check ok"
+      - name: Package
+        if: success()
+        run: |
+          set -e
+          mkdir -p c7109-windows/runtime
+          cp c7c.exe c7109-windows/ || cp c7c c7109-windows/
+          cp -r stdlib c7109-windows/stdlib
+          cp runtime/c7rt.c c7109-windows/runtime/
+          tar czf c7109-windows-msys2.tar.gz c7109-windows
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: c7109-windows-msys2
+          path: c7109-windows-msys2.tar.gz
+
+  release:
+    name: Release assets
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: linux
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: c7109-linux-x86_64
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --generate-notes c7109-*.tar.gz c7109-*.tar.gz.sha256

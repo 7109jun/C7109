@@ -1,0 +1,18 @@
+{
+ "abi": "c7abi1",
+ "bounds_check": false,
+ "debug_alloc": false,
+ "flags": [
+  "-O0",
+  "--debug",
+  "-fno-overflow-check"
+ ],
+ "include": [],
+ "language": "en",
+ "library": [],
+ "link": "dynamic",
+ "mode": "debug",
+ "optimization": "O0",
+ "overflow_check": false,
+ "registry": []
+}

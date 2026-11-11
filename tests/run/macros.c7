@@ -1,0 +1,25 @@
+#define STR(x) #x
+#define XSTR(x) STR(x)
+#define CAT(a, b) a ## b
+#define DECL(name, v) i64 CAT(var_, name) = v;
+#define VERSION 42
+#define SHOW(tag, ...) show(#tag __VA_OPT__(,) __VA_ARGS__)
+
+extern "C" { void c7_print_i64(i64 v); void c7_newline(); }
+void show(Str tag) { println(tag); }
+void show(Str tag, i64 v) { print(tag); print("="); c7_print_i64(v); c7_newline(); }
+
+i32 main() {
+    DECL(a, 5)
+    DECL(b, 7)
+    c7_print_i64(var_a + var_b); c7_newline();
+    println(STR(hello    world));
+    println(STR("quo\"te"));
+    println(STR(VERSION));
+    println(XSTR(VERSION));
+    mut Str s = STR(x + y);
+    println(s);
+    SHOW(plain);
+    SHOW(answer, 42);
+    return 0;
+}

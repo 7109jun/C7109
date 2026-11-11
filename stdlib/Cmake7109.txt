@@ -1,0 +1,16 @@
+# The standard library, built with C7109's own build system (W4 stage 2, dogfooding).
+# `make` runs `c7c pack stdlib` and copies the result to ./std.l7 (output paths must stay inside the project, Q13).
+project "std":
+    version "1.0.0"
+    license "GPL-3.0-only WITH C7109-runtime-library-exception"
+    description "C7109 standard library"
+
+target library "std":
+    sources:
+        "arena.c7"
+        "core.c7"
+        "hashmap.c7"
+        "str.c7"
+        "vec.c7"
+    std "none"
+    output "std.l7"

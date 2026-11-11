@@ -1,0 +1,3 @@
+#include "inc_value.h7"
+extern "C" { void c7_print_i64(i64 v); void c7_newline(); }
+i32 main() { c7_print_i64(VALUE); c7_newline(); return 0; }

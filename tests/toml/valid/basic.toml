@@ -1,0 +1,7 @@
+title = "TOML Example"
+answer = 42
+pi = 3.14159
+yes = true
+no = false
+neg = -17
+pos = +99

@@ -1,0 +1,6 @@
+@test
+void passes() { assert(1 + 1 == 2, "math"); }
+@test
+void fails() { assert(1 + 1 == 3, "deliberate failure"); }
+@test
+void leaks() { mut i32* p = alloc i32; *p = 1; }

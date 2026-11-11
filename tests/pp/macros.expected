@@ -1,0 +1,1 @@
+"hello" "a + b" "a+b" "\"quoted \\n\" 'c' \"q\\\"x\"" "'a'" "VAL" "42" "a42" "" foobar x1 12 a42 bar foo x y xyz xz ab SELF -> += << printf ( "x" ) printf ( "x" , 1 , 2 ) f ( a ) f ( a , b , c ) g ( ) g ( az ) int count_var = 0 ; "hello world" "!" [ "spaced out" ] 

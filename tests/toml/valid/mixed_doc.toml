@@ -1,0 +1,16 @@
+# manifest-like
+format_version = 1
+
+[package]
+name = "Example"
+version = "1.2.3"
+license = "GPL-3.0-only"
+
+[[binary]]
+os = "linux"
+architecture = "x86_64"
+path = "lib/linux-x86_64/libx.a"
+
+[[dependency]]
+name = "Other"
+version = "^1.0"

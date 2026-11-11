@@ -1,0 +1,23 @@
+// expect: E0220
+// expect: E0221
+// expect: E0201
+// expect: E0222
+// expect: E0224
+// expect: E0225
+// expect: E0226
+// expect: E0227
+// expect: E0228
+// expect: E0305
+void f(i32 x, i64 big) {
+    i32 a = "s";
+    u8 b = x;
+    u8 c = 300;
+    i32 d = add3(1, 2);
+    if (x) { }
+    bool e = true + 1;
+    i32 g = "s" as i32;
+    i32 h = *x;
+    i32 k = x[0];
+    i32 uninit;
+}
+i32 add3(i32 a, i32 b, i32 c) { return a; }

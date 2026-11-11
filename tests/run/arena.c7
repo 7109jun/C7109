@@ -1,0 +1,38 @@
+extern "C" {
+    void c7_print_i64(i64 v);
+    void c7_newline();
+}
+void pi(i64 v) { c7_print_i64(v); c7_newline(); }
+
+struct Pair { i64 a; u8 b; }
+
+i32 main() {
+    mut Arena ar = Arena(256);
+    pi(ar.capacity() as i64);
+    mut u8* b1 = null;
+    ar.create(out b1);
+    *b1 = 7;
+    pi(ar.used() as i64);
+    mut i64* n = null;
+    ar.create(out n);
+    *n = 1234567890123;
+    pi(ar.used() as i64);                 // 16: the i64 is aligned up from offset 1
+    pi((n as usize % 8) as i64);          // aligned
+    mut Pair* p = null;
+    ar.create(out p);
+    p->a = 5; p->b = 6;
+    pi(ar.used() as i64);                 // 16 + 16
+    mut i32* xs = null;
+    ar.create_array(10, out xs);
+    for (i in 0..10) { xs[i] = (i * 3) as i32; }
+    pi(xs[9] as i64);
+    pi(ar.used() as i64);                 // 32 + 40
+    pi(*b1 as i64 + *n % 1000 + p->a + p->b as i64);
+    mut i64* big = null;
+    bool ok = ar.create_array(1000, out big);
+    pi(ok ? 1 : 0);                       // does not fit
+    pi(big == null ? 1 : 0);
+    ar.reset();
+    pi(ar.used() as i64);
+    return 0;
+}

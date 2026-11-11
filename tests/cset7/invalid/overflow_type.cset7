@@ -1,0 +1,2 @@
+[build]
+overflow_check = 1

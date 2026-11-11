@@ -1,0 +1,25 @@
+[[products]]
+name = "Hammer"
+sku = 738594937
+
+[[products]]
+
+[[products]]
+name = "Nail"
+color = "gray"
+
+[products.meta]
+ok = true
+
+[[fruits]]
+name = "apple"
+[fruits.physical]
+color = "red"
+[[fruits.varieties]]
+name = "red delicious"
+[[fruits.varieties]]
+name = "granny smith"
+[[fruits]]
+name = "banana"
+[[fruits.varieties]]
+name = "plantain"

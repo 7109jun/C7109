@@ -1,0 +1,44 @@
+extern "C" {
+    void c7_print_i64(i64 v);
+    void c7_print_str(CStr s);
+    void c7_newline();
+}
+void ps(CStr s) { c7_print_str(s); c7_newline(); }
+void pi(i64 v) { c7_print_i64(v); c7_newline(); }
+
+class Guard {
+    priv i32 id;
+    pub init(i32 n) { id = n; }
+    pub drop() { c7_print_str(c"drop "); c7_print_i64(id); c7_newline(); }
+}
+
+enum Err1 : u8 { Boom }
+
+Result<i32, Err1> maybe(bool fail) {
+    if (fail) { return Err(Err1::Boom); }
+    return Ok(7);
+}
+
+Result<i32, Err1> work(bool fail) {
+    Guard g = Guard(1);
+    defer ps(c"cleanup");
+    i32 v = try maybe(fail);
+    Guard h = Guard(2);
+    return Ok(v + 1);
+}
+
+tagged union Small : u8 { A, B(u8 x), C(i64 big) }
+tagged union Wide { P(i32 a, i32 b), Q }
+
+void report(Result<i32, Err1> r) {
+    match (r) { Ok(v) => pi(v); Err(e) => ps(c"failed"); }
+}
+
+i32 main() {
+    report(work(false));
+    report(work(true));
+    pi(sizeof(Small) as i64);
+    pi(sizeof(Wide) as i64);
+    pi(sizeof(Result<i32, Err1>) as i64);
+    return 0;
+}

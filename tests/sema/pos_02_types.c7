@@ -1,0 +1,127 @@
+namespace demo2;
+
+enum ParseError : u8 { Empty, BadDigit, Overflow }
+
+Result<i32, ParseError> parse_i32(Str s) {
+    if (s.len == 0) { return Err(ParseError::Empty); }
+    mut i32 acc = 0;
+    for (ch in s.chars()) {
+        if (ch < '0' || ch > '9') { return Err(ParseError::BadDigit); }
+        acc = acc * 10 + (ch as i32 - '0' as i32);
+    }
+    return Ok(acc);
+}
+
+Result<i32, ParseError> sum_two(Str a, Str b) {
+    i32 x = try parse_i32(a);
+    i32 y = try parse_i32(b);
+    return Ok(x + y);
+}
+
+tagged union Shape { Circle(f64 radius), Rect(f64 w, f64 h), Empty, }
+
+f64 area(const Shape* s) {
+    match (*s) {
+        Circle(r)  => return 3.14159 * r * r;
+        Rect(w, h) => return w * h;
+        Empty      => return 0.0;
+    }
+}
+
+i32 classify(i32 n) {
+    match (n) {
+        0 => return 0;
+        1..=9 => { return 1; }
+        _ => return 2;
+    }
+}
+
+enum Color : u8 { Red = 1, Green, Blue }
+void colors() {
+    Color c = Color::Green;
+    match (c) { Red => return; Green => return; Blue => return; }
+}
+
+class Counter {
+    priv mut i32 value;
+    pub init(i32 start) { value = start; }
+    pub drop() { }
+    pub i32 get() { return value; }
+    pub mut void add(i32 n) { value += n; }
+    pub static Counter zero() { return Counter(0); }
+}
+
+void use_counter() {
+    mut Counter c = Counter(5);
+    c.add(2);
+    i32 v = c.get();
+    Counter z = Counter::zero();
+}
+
+class Buffer {
+    mut u8* data;
+    usize size;
+    init(usize n) { data = alloc u8[n]; size = n; }
+    drop() { free[] data; }
+}
+
+void use_buffer() {
+    Buffer* b = alloc Buffer(1024);
+    defer free b;
+    b.drop();
+}
+
+interface Shape2 { f64 area2(); mut void scale(f64 k); }
+struct Circle { f64 r; }
+impl Shape2 for Circle {
+    f64 area2() { return 3.14159 * r * r; }
+    mut void scale(f64 k) { r = r * k; }
+}
+f64 total(Shape2*[] shapes) {
+    mut f64 sum = 0.0;
+    for (s in shapes) { sum += s->area2(); }
+    return sum;
+}
+void use_shapes() {
+    mut Circle c = Circle{ r: 2.0 };
+    Shape2* s = &c;
+    f64 a = s->area2();
+    void* raw = s as void*;
+}
+
+interface Comparable { i32 compare(const Self* other); }
+impl Comparable for i32 { i32 compare(const i32* other); }
+T max<T : Comparable>(T a, T b) { return a.compare(&b) >= 0 ? a : b; }
+void use_generics() { i32 m = max(3, 5); }
+
+(i32, bool) divide(i32 a, i32 b) {
+    if (b == 0) { return (0, false); }
+    return (a / b, true);
+}
+bool parse_ok(Str s, out i32 result);
+void use_out() {
+    mut i32 v = 0;
+    if (parse_ok("42", out v)) { }
+    (q, ok) = divide(10, 3);
+    (mut r, mut flag) = divide(9, 3);
+    r += 1;
+    (i32, bool) t = divide(1, 2);
+    i32 first = t.0;
+}
+
+struct Vec2 { f32 x; f32 y; }
+Vec2 operator+(Vec2 a, Vec2 b) { return Vec2{ x: a.x + b.x, y: a.y + b.y }; }
+bool operator==(Vec2 a, Vec2 b) { return a.x == b.x && a.y == b.y; }
+void ops() { Vec2 a = Vec2{ 1.0, 2.0 }; Vec2 b = a + a; bool same = a == b; }
+
+union Bits { f32 f; u32 u; }
+void unions() { Bits b = Bits{ f: 1.0 }; u32 raw = b.u; }
+
+void ov(i32 a) { }
+void ov(i64 a) { }
+void use_ov() { ov(1); }
+
+Result<usize, ParseError> opt_demo() {
+    Option<i32> o = Some(1);
+    return Ok(0);
+}

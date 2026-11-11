@@ -1,0 +1,48 @@
+#define STR(x) #x
+#define XSTR(x) STR(x)
+#define CAT(a,b) a ## b
+#define XCAT(a,b) CAT(a,b)
+#define CAT3(a,b,c) a ## b ## c
+#define VAL 42
+#define EMPTY
+#define LOG(fmt, ...) printf(fmt __VA_OPT__(,) __VA_ARGS__)
+#define OPT(x, ...) f(x __VA_OPT__(, __VA_ARGS__) )
+#define OPT2(...) g(__VA_OPT__(a ## __VA_ARGS__))
+#define MAKE(name) int name ## _var = 0 ;
+#define Q(x) #x "!"
+#define OBJ a ## b
+#define SELF CAT(SE, LF)
+#define ARROW(a,b) a ## b
+#define WRAP(x) [ #x ]
+STR(hello)
+STR(  a   +   b  )
+STR(a+b)
+STR("quoted \n" 'c' "q\"x")
+STR('a')
+STR(VAL)
+XSTR(VAL)
+XSTR(XCAT(a, VAL))
+STR()
+CAT(foo, bar)
+CAT(x, 1)
+CAT(1, 2)
+XCAT(a, VAL)
+CAT(,bar)
+CAT(foo,)
+x CAT(,) y
+CAT3(x, y, z)
+CAT3(x, , z)
+OBJ
+SELF
+ARROW(-, >)
+ARROW(+, =)
+ARROW(<, <)
+LOG("x")
+LOG("x", 1, 2)
+OPT(a)
+OPT(a, b, c)
+OPT2()
+OPT2(z)
+MAKE(count)
+Q(hello world)
+WRAP(  spaced   out  )

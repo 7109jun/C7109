@@ -1,0 +1,10 @@
+// expect: E0460
+void use(i32 x) { }
+i32 id(i32 x) { return x; }
+void f() {
+    if (id(1) == 1) { goto skip; }
+    defer { use(1); }            // skipped by the goto, yet it would run at scope end
+    use(2);
+    skip:
+    use(3);
+}

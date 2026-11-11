@@ -1,0 +1,140 @@
+extern "C" {
+    void c7_print_i64(i64 v);
+    void c7_print_f64(f64 v);
+    void c7_print_str(CStr s);
+    void c7_print_char(i32 c);
+    void c7_write(const u8* p, usize n);
+    void c7_newline();
+}
+
+void pi(i64 v) { c7_print_i64(v); c7_newline(); }
+void ps(CStr s) { c7_print_str(s); c7_newline(); }
+
+struct Point { i32 x; i32 y; }
+
+i32 manhattan(Point p) { return p.x + p.y; }
+
+enum Color : u8 { Red = 1, Green, Blue }
+
+i32 color_code(Color c) {
+    match (c) {
+        Red => return 10;
+        Green => return 20;
+        Blue => return 30;
+    }
+}
+
+i32 classify(i32 n) {
+    match (n) {
+        0 => return 100;
+        1..=9 => { return 200; }
+        _ => return 300;
+    }
+}
+
+i32 grade(i32 s) {
+    switch (s / 10) {
+        case 10, 9: return 4;
+        case 8: return 3;
+        case 7: return 2;
+        default: return 0;
+    }
+}
+
+i32 sum_slice(const i32[] xs) {
+    mut i32 t = 0;
+    for (x in xs) { t += x; }
+    return t;
+}
+
+void swap(i32* a, i32* b) { i32 t = *a; *a = *b; *b = t; }
+
+bool parse_pair(i32 a, out i32 doubled) { doubled = a * 2; return true; }
+
+(i32, bool) divide(i32 a, i32 b) {
+    if (b == 0) { return (0, false); }
+    return (a / b, true);
+}
+
+mut i64 counter = 0;
+
+class Guard {
+    priv i32 id;
+    pub init(i32 n) { id = n; }
+    pub drop() { c7_print_str(c"drop "); c7_print_i64(id); c7_newline(); }
+    pub i32 get() { return id; }
+}
+
+class Acc {
+    priv mut i64 total;
+    pub init() { total = 0; }
+    pub mut void add(i64 n) { total += n; }
+    pub i64 get() { return total; }
+}
+
+i32 guarded() {
+    Guard a = Guard(1);
+    Guard b = Guard(2);
+    defer ps(c"deferred");
+    return b.get() + a.get();
+}
+
+i32 main() {
+    Point p = Point{ x: 3, y: 4 };
+    pi(manhattan(p));
+    pi(color_code(Color::Green));
+    pi(classify(0)); pi(classify(5)); pi(classify(50));
+    pi(grade(95)); pi(grade(81)); pi(grade(12));
+
+    i32[5] arr = {1, 2, 3, 4, 5};
+    pi(sum_slice(arr));
+    i32[] mid = arr[1..4];
+    pi(sum_slice(mid));
+    pi(mid.len as i64);
+    pi(arr[2]);
+
+    mut i32 a = 1;
+    mut i32 b = 2;
+    swap(&a, &b);
+    pi(a); pi(b);
+
+    mut i32 d = 0;
+    if (parse_pair(21, out d)) { pi(d); }
+    (q, ok) = divide(17, 5);
+    pi(q);
+
+    mut i32* buf = alloc i32[4];
+    for (i in 0..4) { buf[i] = i * i; }
+    pi(buf[3]);
+    free[] buf;
+
+    mut Acc acc = Acc();
+    for (i in 1..=10) { acc.add(i); }
+    pi(acc.get());
+
+    pi(guarded());
+
+    f64 r = 2.5 * 4.0;
+    c7_print_f64(r); c7_newline();
+    i32 trunc = 7.9 as i32;
+    pi(trunc);
+    u8 wrapped = 300 as u8;
+    pi(wrapped);
+    Str s = "héllo";
+    pi(s.len as i64);
+    c7_write(s.ptr, s.len); c7_newline();
+    c7_print_char('A' as i32); c7_print_char('한' as i32); c7_newline();
+
+    mut i32 total = 0;
+    outer: for (i in 0..5) {
+        for (j in 0..5) {
+            if (j == 3) { continue outer; }
+            if (i == 3) { break outer; }
+            total += 1;
+        }
+    }
+    pi(total);
+    counter += 5;
+    pi(counter);
+    return 0;
+}

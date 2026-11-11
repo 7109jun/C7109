@@ -1,0 +1,18 @@
+// expect: E0301
+// expect: E0302
+// expect: E0303
+class C {
+    priv mut i32 v;
+    pub init() { v = 0; }
+    pub void bad() { v = 1; }
+    pub mut void ok() { v = 1; }
+}
+void f() {
+    i32 a = 1;
+    a = 2;
+    i32* p = &a;
+    C c = C();
+    c.ok();
+    const i32* q = &a;
+    *q = 3;
+}

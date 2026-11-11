@@ -1,0 +1,1 @@
+i32 main() { println("marker"); print_i64(std_marker()); newline(); return 0; }

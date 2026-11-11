@@ -1,0 +1,10 @@
+// expect: E0460
+void use(i32 x) { }
+i32 id(i32 x) { return x; }
+void f() {
+    if (id(1) == 1) { goto skip; }
+    i32 a = 5;
+    use(a);
+    skip:
+    use(0);
+}

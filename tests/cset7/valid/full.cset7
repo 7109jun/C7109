@@ -1,0 +1,20 @@
+[compiler]
+requires = ">=1.0.0-alpha.1"
+[target]
+os = "linux"
+architecture = "x86_64"
+abi = "c7abi1"
+[build]
+mode = "debug"
+optimization = "O1"
+bounds_check = true
+overflow_check = true
+debug_alloc = true
+[diagnostics]
+language = "ko"
+[link]
+mode = "static"
+[paths]
+include = ["inc", "vendor/inc"]
+library = ["lib"]
+registry = ["../reg"]

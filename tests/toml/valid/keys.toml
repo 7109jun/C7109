@@ -1,0 +1,8 @@
+"quoted key" = 1
+'literal key' = 2
+bare_key-1 = 3
+dotted.key.path = 4
+"a.b".c = 5
+site."google.com" = true
+"ʎǝʞ" = "unicode"
+3.14 = "pi"

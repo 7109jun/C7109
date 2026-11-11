@@ -1,0 +1,4 @@
+#pragma once
+#define SQUARE(x) ((x) * (x))
+#define VERSION_OK 1
+i32 header_fn(i32 v);

@@ -1,0 +1,125 @@
+@repr(C) @align(16)
+struct Vec4 { f32 x; f32 y; f32 z; f32 w; }
+
+struct Point {
+    f32 x;
+    f32 y;
+}
+
+@packed
+struct Flags {
+    u8 enabled : 1;
+    u8 mode    : 3;
+    u8 reserved: 4;
+}
+
+union Bits {
+    f32 f;
+    u32 u;
+}
+
+enum Color : u8 {
+    Red = 1,
+    Green,
+    Blue,
+}
+
+tagged union Token : u8 {
+    Number(i64 value),
+    Ident(Str name),
+    Plus,
+    Minus,
+}
+
+@repr(C)
+tagged union Event : u32 {
+    Key(u32 code),
+    Click(i32 x, i32 y),
+}
+
+tagged union Result<T, E> {
+    Ok(T value),
+    Err(E error),
+}
+
+type Size = usize;
+
+class Counter {
+    priv mut i32 value;
+
+    pub init(i32 start) { value = start; }
+    pub drop() { }
+
+    pub i32 get() { return value; }
+    pub mut void add(i32 n) { value += n; }
+    pub static Counter zero() { return Counter(0); }
+}
+
+interface Shape {
+    f64 area();
+    mut void scale(f64 k);
+}
+
+interface Ord : Eq + Hashable {
+    i32 compare(const Self* other);
+}
+
+struct Circle { f64 r; }
+
+impl Shape for Circle {
+    f64 area() { return 3.14159 * r * r; }
+    mut void scale(f64 k) { r = r * k; }
+}
+
+struct Vec<T> {
+    mut T*    data;
+    mut usize len;
+    mut usize cap;
+}
+
+impl<T> Vec<T> {
+    pub mut Result<void, AllocError> push(T value) { return Ok(0); }
+    pub usize size() { return len; }
+}
+
+T max<T : Comparable>(T a, T b) {
+    return a.compare(&b) >= 0 ? a : b;
+}
+
+@specialize(f32, f64)
+T dot<T : Numeric>(const T[] a, const T[] b) {
+    mut T acc = T::zero();
+    for (i in 0..a.len) { acc += a[i] * b[i]; }
+    return acc;
+}
+
+Vec2 operator+(Vec2 a, Vec2 b) { return Vec2{ a.x + b.x, a.y + b.y }; }
+bool operator==(Vec2 a, Vec2 b) { return a.x == b.x && a.y == b.y; }
+f32* Vec2::operator[](usize i) { return i == 0 ? &x : &y; }
+
+void closures() {
+    mut i32 total = 0;
+    i32 base = 10;
+    closure(i32) -> void add = (i32 x) -> void { total += x + base; };
+    closure(i32) -> void add2 = [base, &total](i32 x) -> void { total += x + base; };
+    closure() -> void all = [=]() -> void { };
+    fn(i32) -> i32 fp = twice;
+    add(1);
+}
+
+closure() -> void make_counter(mut i32 start) {
+    return heap [start]() -> void { };
+}
+
+void use_generics() {
+    i32 m = max(3, 5);
+    f64 f = max<f64>(1.0, 2.0);
+    Vec<i32> v = Vec<i32>::init();
+    Vec<Vec<i32>> vv = Vec<Vec<i32>>::init();
+    Point p = Point{ x: 1.0, y: 2.0 };
+    Point q = Point{ 3.0, 4.0 };
+    Bits b = Bits{ f: 1.0 };
+    Color c = Color::Green;
+    f64 a = s->area();
+    void* raw = s as void*;
+}

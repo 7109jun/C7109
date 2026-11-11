@@ -1,0 +1,61 @@
+extern "C" {
+    void c7_print_i64(i64 v);
+    void c7_newline();
+}
+void pi(i64 v) { c7_print_i64(v); c7_newline(); }
+
+i32 apply(closure(i32) -> i32 f, i32 v) { return f(v); }
+
+closure(i32) -> i32 make_adder(i32 n) {
+    return heap [n](i32 x) -> i32 { return x + n; };
+}
+
+void count_to(i32 limit, closure(i32) -> void visit) {
+    for (i in 0..limit) { visit(i); }
+}
+
+class Counter {
+    priv mut i32 hits;
+    pub init() { hits = 0; }
+    pub mut void run() {
+        closure() -> void bump = () -> void { hits += 1; };
+        bump(); bump(); bump();
+    }
+    pub i32 get() { return hits; }
+}
+
+i32 main() {
+    i32 base = 10;
+    closure(i32) -> i32 addb = (i32 x) -> i32 { return x + base; };
+    pi(addb(5));
+    pi(apply(addb, 7));
+
+    mut i32 total = 0;
+    closure(i32) -> void acc = (i32 x) -> void { total += x; };
+    acc(3); acc(4);
+    pi(total);
+    count_to(5, acc);
+    pi(total);
+
+    closure(i32) -> i32 add5 = make_adder(5);
+    pi(add5(1));
+    pi(apply(add5, 100));
+    free_closure(add5);
+
+    mut i32 counter = 100;
+    closure() -> i32 next = [counter]() -> i32 { counter += 1; return counter; };
+    pi(next());
+    pi(next());
+    pi(counter);
+
+    closure(i32) -> i32 sq = (i32 x) -> i32 { return x * x; };
+    pi(apply(sq, 9));
+
+    closure(i32, i32) -> i32 add = (i32 a, i32 b) -> i32 { return a + b + base; };
+    pi(add(1, 2));
+
+    mut Counter c = Counter();
+    c.run();
+    pi(c.get());
+    return 0;
+}

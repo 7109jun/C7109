@@ -1,0 +1,4 @@
+mystery = 1
+[build]
+mode = "release"
+future = true

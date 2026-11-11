@@ -1,0 +1,78 @@
+extern "C" {
+    CInt puts(CStr s);
+    void* malloc(CSize n);
+}
+
+@export extern "C"
+CInt c7_add(CInt a, CInt b) { return a + b; }
+
+@export extern "system"
+CInt on_event(CInt code) { return 0; }
+
+@panic_handler
+@noreturn
+void on_panic(Str msg) {
+    hw::serial_write(0x3F8, msg);
+    for (;;) { cpu::halt(); }
+}
+
+@entry
+@noreturn
+void kernel_main() { }
+
+struct UartRegs {
+    volatile u32 data;
+    volatile u32 status;
+}
+
+void uart_putc(UartRegs* uart, u8 ch) {
+    while ((uart->status & 0x20) == 0) { cpu::pause(); }
+    uart->data = ch as u32;
+}
+
+@interrupt
+void timer_handler(InterruptFrame* frame) {
+    ticks += 1;
+    pic_eoi(0);
+}
+
+void simd() {
+    V4f32 a = V4f32::splat(1.0);
+    V4f32 b = V4f32{ 1.0, 2.0, 3.0, 4.0 };
+    V4f32 c = a + b * a;
+    f32 s = simd::reduce_add(c);
+    if (cpu::has(Feature::Avx2)) { }
+}
+
+@multiversion(avx512f, avx2, sse4_2, default)
+void saxpy(f32 a, const f32[] x, f32[] y) {
+    for (i in 0..x.len) { y[i] = a * x[i] + y[i]; }
+}
+
+@target_feature("avx2")
+void fast() { }
+
+enum MemoryOrder { Relaxed, Acquire, Release, AcqRel, SeqCst }
+
+Atomic<u32> counter = Atomic<u32>::init(0);
+thread_local mut i32 errno_value = 0;
+
+void hit() {
+    counter.fetch_add(1, MemoryOrder::Relaxed);
+}
+
+bool try_lock(Atomic<u32>* flag) {
+    mut u32 expected = 0;
+    return flag->compare_exchange(out expected, 1, MemoryOrder::Acquire, MemoryOrder::Relaxed);
+}
+
+@test
+void add_works() {
+    std::test::assert_eq(add(2, 3), 5);
+}
+
+void c_interop() {
+    c::puts(c"hello");
+    mut i128 wide = 1i128;
+    u128 uw = 340282366920938463463374607431768211455u128;
+}

@@ -1,0 +1,2 @@
+namespace std;
+i64 std_marker() { return 4242; }

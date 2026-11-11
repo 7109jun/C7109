@@ -1,0 +1,7 @@
+// expect: E0005
+// expect: E0004
+// expect: E0003
+i32 a = 007;
+Str s = "bad \q escape";
+i32 b = 1 $ 2;
+i32 c = 5zz;

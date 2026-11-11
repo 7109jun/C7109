@@ -1,0 +1,401 @@
+Unit `tests/cases/03_errors_memory.c7`
+  Enum `ParseError`
+    TypePrim `u8`
+    Enumerator `Empty`
+    Enumerator `BadDigit`
+    Enumerator `Overflow`
+  Func `parse_i32`
+    TypeName `Result`
+      TypeArgs
+        TypePrim `i32`
+        TypeName `ParseError`
+    Param `s`
+      TypeName `Str`
+    Block
+      If
+        Binary `==`
+          Member `len`
+            Path `s`
+          IntLit `0`
+        Block
+          Return
+            Call
+              Path `Err`
+              Path `ParseError::Empty`
+      Var `acc` [mut]
+        TypePrim `i32`
+        IntLit `0`
+      ForIn `ch`
+        Call
+          Member `chars`
+            Path `s`
+        Block
+          If
+            Binary `||`
+              Binary `<`
+                Path `ch`
+                CharLit `'0'`
+              Binary `>`
+                Path `ch`
+                CharLit `'9'`
+            Block
+              Return
+                Call
+                  Path `Err`
+                  Path `ParseError::BadDigit`
+          AssignOrDecl `=`
+            Path `acc`
+            Binary `+`
+              Binary `*`
+                Path `acc`
+                IntLit `10`
+              Binary `-`
+                Cast
+                  Path `ch`
+                  TypePrim `i32`
+                Cast
+                  CharLit `'0'`
+                  TypePrim `i32`
+      Return
+        Call
+          Path `Ok`
+          Path `acc`
+  Func `sum_two`
+    TypeName `Result`
+      TypeArgs
+        TypePrim `i32`
+        TypeName `ParseError`
+    Param `a`
+      TypeName `Str`
+    Param `b`
+      TypeName `Str`
+    Block
+      Var `x`
+        TypePrim `i32`
+        Try
+          Call
+            Path `parse_i32`
+            Path `a`
+      Var `y`
+        TypePrim `i32`
+        Try
+          Call
+            Path `parse_i32`
+            Path `b`
+      Return
+        Call
+          Path `Ok`
+          Binary `+`
+            Path `x`
+            Path `y`
+  Func `show`
+    TypePrim `void`
+    Block
+      Match
+        Call
+          Path `parse_i32`
+          StrLit `12x`
+        Arm
+          PatVariant `Ok`
+            PatName `v`
+          ExprStmt
+            Call
+              Path `print_i32`
+              Path `v`
+        Arm
+          PatVariant `Err`
+            PatName `e`
+          ExprStmt
+            Call
+              Path `print_error`
+              Path `e`
+  Tagged `Shape`
+    Variant `Circle`
+      Param `radius`
+        TypePrim `f64`
+    Variant `Rect`
+      Param `w`
+        TypePrim `f64`
+      Param `h`
+        TypePrim `f64`
+    Variant `Empty`
+  Func `area`
+    TypePrim `f64`
+    Param `s`
+      TypePtr
+        TypeConst
+          TypeName `Shape`
+    Block
+      Match
+        Unary `*`
+          Path `s`
+        Arm
+          PatVariant `Circle`
+            PatName `r`
+          Return
+            Binary `*`
+              Binary `*`
+                FloatLit `3.14159`
+                Path `r`
+              Path `r`
+        Arm
+          PatVariant `Rect`
+            PatName `w`
+            PatName `h`
+          Return
+            Binary `*`
+              Path `w`
+              Path `h`
+        Arm
+          PatName `Empty`
+          Return
+            FloatLit `0.0`
+  Func `classify`
+    TypePrim `i32`
+    Param `n`
+      TypePrim `i32`
+    Block
+      Match
+        Path `n`
+        Arm
+          PatLit `0`
+          Return
+            IntLit `0`
+        Arm
+          PatRange `..=`
+            PatLit `1`
+            PatLit `9`
+          Block
+            Return
+              IntLit `1`
+        Arm
+          PatWild
+          Return
+            IntLit `2`
+  Func `divide`
+    TypeTuple
+      TypePrim `i32`
+      TypePrim `bool`
+    Param `a`
+      TypePrim `i32`
+    Param `b`
+      TypePrim `i32`
+    Block
+      If
+        Binary `==`
+          Path `b`
+          IntLit `0`
+        Block
+          Return
+            Tuple
+              IntLit `0`
+              BoolLit `false`
+      Return
+        Tuple
+          Binary `/`
+            Path `a`
+            Path `b`
+          BoolLit `true`
+  Func `parse_ok`
+    TypePrim `bool`
+    Param `s`
+      TypeName `Str`
+    Param `result` [out]
+      TypePrim `i32`
+  Func `use_out`
+    TypePrim `void`
+    Block
+      Var `v` [mut]
+        TypePrim `i32`
+        IntLit `0`
+      If
+        Call
+          Path `parse_ok`
+          StrLit `42`
+          OutArg
+            Path `v`
+        Block
+      Var `t`
+        TypeTuple
+          TypePrim `i32`
+          TypePrim `bool`
+        Call
+          Path `divide`
+          IntLit `1`
+          IntLit `2`
+      Var `first`
+        TypePrim `i32`
+        Member `0`
+          Path `t`
+  Func `read_all`
+    TypeName `Result`
+      TypeArgs
+        TypePrim `usize`
+        TypeName `IoError`
+    Param `path`
+      TypeName `Str`
+    Param `out_buf` [mut]
+      TypePtr
+        TypePrim `u8`
+    Block
+      Var `f`
+        TypeName `File`
+        Try
+          Call
+            Path `File::open`
+            Path `path`
+      Defer
+        ExprStmt
+          Call
+            Member `close`
+              Path `f`
+      Var `tmp` [mut]
+        TypePtr
+          TypePrim `u8`
+        Alloc
+          TypePrim `u8`
+          Empty `count`
+            IntLit `4096`
+      If
+        Binary `==`
+          Path `tmp`
+          NullLit
+        Block
+          Return
+            Call
+              Path `Err`
+              Path `IoError::OutOfMemory`
+      Defer
+        Free [array]
+          Path `tmp`
+      Return
+        Call
+          Path `Ok`
+          Try
+            Call
+              Member `read`
+                Path `f`
+              Path `tmp`
+              IntLit `4096`
+  Func `memory`
+    TypePrim `void`
+    Block
+      Var `p` [mut]
+        TypePtr
+          TypePrim `i32`
+        Alloc
+          TypePrim `i32`
+      If
+        Binary `==`
+          Path `p`
+          NullLit
+        Block
+          Return
+      Assign `=`
+        Unary `*`
+          Path `p`
+        IntLit `7`
+      Free
+        Path `p`
+      Var `v` [mut]
+        TypePtr
+          TypePrim `f32`
+        Alloc
+          TypePrim `f32`
+          Empty `count`
+            IntLit `1024`
+      Free [array]
+        Path `v`
+      Var `z` [mut]
+        TypePtr
+          TypePrim `f32`
+        Alloc [zeroed]
+          TypePrim `f32`
+          Empty `count`
+            IntLit `16`
+      Var `b`
+        TypePtr
+          TypeName `Buffer`
+        Alloc
+          TypeName `Buffer`
+          Empty `init-args`
+            IntLit `1024`
+      Var `arena`
+        TypeName `Arena`
+        Call
+          Path `Arena::init`
+          Path `buffer`
+          Binary `*`
+            IntLit `64`
+            IntLit `1024`
+      Var `n` [mut]
+        TypePtr
+          TypeName `Node`
+        Alloc
+          Empty `allocator`
+            Unary `&`
+              Path `arena`
+          TypeName `Node`
+      Free
+        Unary `&`
+          Path `arena`
+        Path `n`
+      ExprStmt
+        Call
+          Member `reset`
+            Path `arena`
+      Free
+        Path `p`
+      ExprStmt
+        Call
+          Member `drop`
+            Path `b`
+  Class `Buffer`
+    Var `data` [mut]
+      TypePtr
+        TypePrim `u8`
+    Var `size`
+      TypePrim `usize`
+    Init
+      Param `n`
+        TypePrim `usize`
+      Block
+        AssignOrDecl `=`
+          Path `data`
+          Alloc
+            TypePrim `u8`
+            Empty `count`
+              Path `n`
+        AssignOrDecl `=`
+          Path `size`
+          Path `n`
+    Drop
+      Block
+        Free [array]
+          Path `data`
+  Func `asserts`
+    TypePrim `void`
+    Block
+      ExprStmt
+        Call
+          Path `assert`
+          Binary `>`
+            Path `x`
+            IntLit `0`
+          StrLit `x must be positive`
+      If
+        Path `bad`
+        Block
+          ExprStmt
+            Call
+              Path `panic`
+              StrLit `boom`
+      ExprStmt
+        Call
+          Path `unreachable`
+      ExprStmt
+        Sizeof
+          TypePrim `i32`
+      ExprStmt
+        Alignof
+          TypeName `Point`

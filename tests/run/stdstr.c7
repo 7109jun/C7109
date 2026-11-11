@@ -1,0 +1,25 @@
+i32 main() {
+    println("Hello from std!");
+    mut StrBuf sb = StrBuf();
+    sb.append("héllo");
+    sb.push_char(' ');
+    sb.push_char('한');
+    sb.append(" world");
+    println(sb.as_str());
+    print_u64(sb.size() as u64); newline();
+
+    mut usize count = 0;
+    for (ch in sb.as_str().chars()) { count += 1; }
+    print_u64(count as u64); newline();
+
+    Str a = "abc";
+    Str b = "abc";
+    Str c = "abd";
+    print_bool(a == b); newline();
+    print_bool(a == c); newline();
+    print_bool(a != c); newline();
+    print_bool(a.starts_with("ab")); newline();
+    println(a.slice(1, 3));
+    assert(sb.size() == 16, "length check");
+    return 0;
+}

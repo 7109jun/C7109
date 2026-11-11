@@ -1,0 +1,8 @@
+extern "C" { void c7_print_i64(i64 v); void c7_newline(); }
+i32 main() {
+    mut i32[4] local = {1, 2, 3, 4};
+    mut i32* p = &local[0];
+    c7_print_i64(1); c7_newline();
+    free p;
+    return 0;
+}

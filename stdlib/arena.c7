@@ -1,0 +1,41 @@
+// std arena: bump allocator over one block. Individual objects are never freed; reset() or drop() releases everything.
+// Objects placed in an arena must not need a destructor (the arena never runs drop).
+namespace std;
+
+class Arena {
+    priv mut u8* base;
+    priv mut usize cap;
+    priv mut usize used_;
+
+    pub init(usize capacity) {
+        base = alloc u8[capacity];
+        cap = base == null ? 0 : capacity;
+        used_ = 0;
+    }
+    pub drop() { if (base != null) { free[] base; } }
+
+    pub usize capacity() { return cap; }
+    pub usize used() { return used_; }
+    pub mut void reset() { used_ = 0; }
+
+    // Returns null when the block is exhausted. `align` must be a power of two.
+    pub mut void* alloc_bytes(usize size, usize align) {
+        usize start = (used_ + align - 1) & ~(align - 1);
+        if (start > cap || size > cap - start) { return null; }
+        used_ = start + size;
+        return (base + start) as void*;
+    }
+
+    // `T` is inferred from the pointer variable passed as `slot`. Sets it to null and returns false on exhaustion.
+    pub mut bool create<T>(out T* slot) {
+        slot = self->alloc_bytes(sizeof(T), alignof(T)) as T*;
+        return slot != null;
+    }
+
+    pub mut bool create_array<T>(usize n, out T* slot) {
+        slot = null;
+        if (n != 0 && sizeof(T) > (cap / n)) { return false; }
+        slot = self->alloc_bytes(sizeof(T) * n, alignof(T)) as T*;
+        return slot != null;
+    }
+}

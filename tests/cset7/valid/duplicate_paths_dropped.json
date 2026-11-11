@@ -1,0 +1,21 @@
+{
+ "abi": "c7abi1",
+ "bounds_check": false,
+ "debug_alloc": false,
+ "flags": [
+  "-O0",
+  "-Ia",
+  "-Ib"
+ ],
+ "include": [
+  "a",
+  "b"
+ ],
+ "language": "en",
+ "library": [],
+ "link": "dynamic",
+ "mode": "release",
+ "optimization": "O0",
+ "overflow_check": false,
+ "registry": []
+}

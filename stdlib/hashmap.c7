@@ -1,0 +1,132 @@
+// std hashmap: open-addressing hash table (linear probing, power-of-two capacity).
+// K and V live in parallel arrays and are only touched through K*/V*, never inside an aggregate.
+// Keys and values must not need a destructor.
+namespace std;
+
+interface Hashable {
+    u64 hash();
+    bool eq(const Self* other);
+}
+
+// Wrapping 64-bit multiply that is also legal under Debug overflow checks: widen to 128 bits, multiply, truncate with `as`.
+u64 hash_mul(u64 a, u64 b) {
+    u128 wide = (a as u128) * (b as u128);
+    return wide as u64;
+}
+
+u64 hash_mix(u64 x) {
+    u64 golden = 0x9E3779B97F4A7C15;
+    u64 h = hash_mul(x, golden);
+    return h ^ (h >> 32);
+}
+
+impl Hashable for i32 { u64 hash() { return hash_mix(*self as u64); } bool eq(const i32* other) { return *self == *other; } }
+impl Hashable for i64 { u64 hash() { return hash_mix(*self as u64); } bool eq(const i64* other) { return *self == *other; } }
+impl Hashable for u32 { u64 hash() { return hash_mix(*self as u64); } bool eq(const u32* other) { return *self == *other; } }
+impl Hashable for u64 { u64 hash() { return hash_mix(*self); } bool eq(const u64* other) { return *self == *other; } }
+impl Hashable for usize { u64 hash() { return hash_mix(*self as u64); } bool eq(const usize* other) { return *self == *other; } }
+
+impl Hashable for Str {
+    u64 hash() {
+        mut u64 h = 14695981039346656037;
+        u64 prime = 1099511628211;
+        for (i in 0..self->len) { h = hash_mul(h ^ (self->ptr[i] as u64), prime); }
+        return h;
+    }
+    bool eq(const Str* other) { return *self == *other; }
+}
+
+class HashMap<K : Hashable, V> {
+    priv mut K* keys;
+    priv mut V* vals;
+    priv mut u8* state;   // 0 empty, 1 full, 2 deleted
+    priv mut usize cap;
+    priv mut usize len;
+    priv mut usize used;  // full + deleted slots
+
+    pub init() { keys = null; vals = null; state = null; cap = 0; len = 0; used = 0; }
+    pub drop() {
+        if (keys != null) { free[] keys; free[] vals; free[] state; }
+    }
+
+    pub usize size() { return len; }
+
+    // Slot holding `key`, or `cap` when it is absent.
+    priv usize find(const K* key) {
+        if (cap == 0) { return 0; }
+        usize mask = cap - 1;
+        mut usize i = (key->hash() as usize) & mask;
+        mut usize n = 0;
+        while (n < cap) {
+            u8 s = state[i];
+            if (s == 0) { return cap; }
+            if (s == 1 && keys[i].eq(key)) { return i; }
+            i = (i + 1) & mask;
+            n += 1;
+        }
+        return cap;
+    }
+
+    priv mut Result<void, AllocError> rehash(usize ncap) {
+        mut K* nk = alloc K[ncap];
+        mut V* nv = alloc V[ncap];
+        mut u8* ns = alloc u8[ncap];
+        if (nk == null || nv == null || ns == null) {
+            if (nk != null) { free[] nk; }
+            if (nv != null) { free[] nv; }
+            if (ns != null) { free[] ns; }
+            return Err(AllocError::OutOfMemory);
+        }
+        for (j in 0..ncap) { ns[j] = 0; }
+        usize nmask = ncap - 1;
+        for (i in 0..cap) {
+            if (state[i] != 1) { continue; }
+            mut usize j = (keys[i].hash() as usize) & nmask;
+            while (ns[j] != 0) { j = (j + 1) & nmask; }
+            ns[j] = 1;
+            nk[j] = keys[i];
+            nv[j] = vals[i];
+        }
+        if (keys != null) { free[] keys; free[] vals; free[] state; }
+        keys = nk; vals = nv; state = ns;
+        cap = ncap;
+        used = len;
+        return Ok();
+    }
+
+    pub mut Result<void, AllocError> put(K key, V value) {
+        usize at = find(&key);
+        if (at != cap) { vals[at] = value; return Ok(); }
+        if ((used + 1) * 4 > cap * 3) {
+            mut usize ncap = cap;
+            if (cap == 0) { ncap = 8; } else if (len * 2 >= cap) { ncap = cap * 2; }
+            try rehash(ncap);
+        }
+        usize mask = cap - 1;
+        mut usize j = (key.hash() as usize) & mask;
+        while (state[j] == 1) { j = (j + 1) & mask; }
+        if (state[j] == 0) { used += 1; }
+        state[j] = 1;
+        keys[j] = key;
+        vals[j] = value;
+        len += 1;
+        return Ok();
+    }
+
+    // Pointer to the value stored for `key`, or null.
+    pub V* get(const K* key) {
+        usize at = find(key);
+        if (at == cap) { return null; }
+        return &vals[at];
+    }
+
+    pub bool contains(const K* key) { return find(key) != cap; }
+
+    pub mut bool remove(const K* key) {
+        usize at = find(key);
+        if (at == cap) { return false; }
+        state[at] = 2;
+        len -= 1;
+        return true;
+    }
+}

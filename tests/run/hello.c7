@@ -1,0 +1,11 @@
+extern "C" {
+    void c7_print_str(CStr s);
+    void c7_print_i64(i64 v);
+    void c7_newline();
+}
+
+i32 main() {
+    c7_print_str(c"Hello, C7109!");
+    c7_newline();
+    return 0;
+}

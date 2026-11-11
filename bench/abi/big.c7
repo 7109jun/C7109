@@ -1,0 +1,11 @@
+// C. larger struct (32 bytes) passed and returned by value: memory path.
+extern "C" { void c7_print_i64(i64 v); void c7_newline(); }
+struct Q { i64 a; i64 b; i64 c; i64 d; }
+Q step(Q x, Q y) { return Q{ x.a + y.d, x.b + y.c, x.c + y.b, x.d + y.a }; }
+Q rec(i32 n) {
+    if (n < 2) { return Q{ n as i64, 1, 2, 3 }; }
+    Q x = rec(n - 1);
+    Q y = rec(n - 2);
+    return step(x, y);
+}
+i32 main() { Q r = rec(38); c7_print_i64((r.a + r.b + r.c + r.d) % 1000003); c7_newline(); return 0; }

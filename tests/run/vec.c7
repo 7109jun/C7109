@@ -1,0 +1,37 @@
+extern "C" {
+    void c7_print_i64(i64 v);
+    void c7_newline();
+}
+void pi(i64 v) { c7_print_i64(v); c7_newline(); }
+
+struct Point { i32 x; i32 y; }
+
+i32 main() {
+    mut Vec<i32> v = Vec<i32>();
+    pi(v.size() as i64);
+    for (i in 0..10) {
+        match (v.push(i * i)) { Ok => {} Err(e) => { return 1; } }
+    }
+    pi(v.size() as i64);
+    pi(*v.at(3) as i64);
+    pi(*v.at(9) as i64);
+    mut i64 sum = 0;
+    for (i in 0..v.size()) { sum += *v.at(i) as i64; }
+    pi(sum);
+    mut i32 top = 0;
+    if (v.pop(out top)) { pi(top as i64); }
+    pi(v.size() as i64);
+    v.clear();
+    pi(v.size() as i64);
+
+    mut Vec<Point> ps = Vec<Point>();
+    for (i in 0..5) { ps.push(Point{ x: i, y: i * 10 }); }
+    pi(ps.at(4)->y as i64);
+    pi(ps.size() as i64);
+
+    mut Vec<f64>* hp = alloc Vec<f64>();
+    hp->push(2.5);
+    pi((*hp->at(0) * 2.0) as i64);
+    free hp;
+    return 0;
+}
