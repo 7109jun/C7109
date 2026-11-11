@@ -47,6 +47,7 @@ target executable "app":
 ## 검증
 
 - `make test`는 `tests/run`·`tests/dbg`의 모든 프로그램을 4가지 옵션 조합(`-O0`, `-O2`, `--debug -fbounds-check`, `-fdebug-alloc`)으로 Windows용으로 크로스 빌드하고 PE 헤더(AMD64, PE32+, 콘솔)를 확인한다(`tests/gen_windows_suite.py`).
+- Wine이 설치돼 있으면 `make test`가 같은 프로그램을 Wine으로 실행해 대조한다(`C7_RUNNER=wine python3 tests/run_windows_suite.py DIR`, 없으면 건너뛴다고 출력). 59개 모두 통과한다.
 - **CI는 이렇게 만든 프로그램을 실제 Windows 러너에서 실행**해 stdout·종료 코드·stderr를 Linux 테스트와 같은 기대값에 대조한다(`tests/run_windows_suite.py`).
 
 ## 알려진 한계

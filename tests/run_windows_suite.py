@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """Runs the programs built by gen_windows_suite.py (on Windows) and compares stdout, exit status and stderr.
-usage: run_windows_suite.py SUITEDIR"""
-import json, os, subprocess, sys
+usage: run_windows_suite.py SUITEDIR
+Set C7_RUNNER=wine (or any command prefix) to run the programs through an emulator on a non-Windows host."""
+import json, os, shlex, subprocess, sys
+
+RUNNER = shlex.split(os.environ.get("C7_RUNNER", ""))
 
 d = sys.argv[1]
 cases = json.load(open(os.path.join(d, "manifest.json")))
@@ -9,7 +12,7 @@ bad = 0
 def norm(b): return b.replace(b"\r\n", b"\n").rstrip(b"\n")
 for c in cases:
     try:
-        p = subprocess.run([os.path.join(d, c["exe"])], capture_output=True, timeout=60)
+        p = subprocess.run([*RUNNER, os.path.join(d, c["exe"])], capture_output=True, timeout=60)
     except Exception as e:
         bad += 1; print("FAIL", c["name"], "could not run:", e); continue
     exp = c["expected"].encode("utf-8", "surrogateescape")
