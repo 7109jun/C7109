@@ -363,6 +363,7 @@ std::string compilerFingerprint(const std::string& self) {
   std::string s = std::string(kCompilerName) + " " + kCompilerVersion + " " + kAbiId + "\n";
   s += "c7c " + fileHash(self) + "\n";
   s += "runtime " + fileHash(exeDir / "runtime" / "c7rt.c") + "\n";
+  s += "runtime-win " + fileHash(exeDir / "runtime" / "c7rt_win.c") + "\n";
   const char* env = std::getenv("C7_STDLIB");  // same choice as the loader: C7_STDLIB > std.l7 > stdlib/
   std::error_code ec;
   if (env) {
@@ -518,6 +519,7 @@ std::vector<std::string> commandFor(const Project& p, size_t ti, const std::stri
     for (size_t k = 0; k < p.b.targets.size(); k++) if (p.b.targets[k].name == l) a.push_back(p.g.nodes[k].output);
   }
   for (auto& f : o.toFlags()) a.push_back(f);
+  if (p.g.nodes[ti].platform != kSupportedPlatform) a.push_back("--target=" + p.g.nodes[ti].platform);
   for (auto& dd : t.defines) a.push_back("-D" + dd);
   if (t.std && *t.std == "none") a.push_back("--no-std");
   if (t.kind == BuildTarget::Executable) {

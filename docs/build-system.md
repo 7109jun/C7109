@@ -81,7 +81,7 @@ target executable "app":
 | `defines:` | `NAME` / `NAME=VALUE` | `-D` |
 | `depends:` | 이름 목록 | 같은 프로젝트의 타깃 또는 `dependency` 이름 |
 | `output` | 경로 | 기본 `<빌드 디렉터리>/<이름>`(라이브러리는 `<이름>-<버전>.l7`) |
-| `platform` | `"<arch>-<os>"` | 기본 호스트. 지원은 `x86_64-linux`뿐(그 밖은 `E0715`) |
+| `platform` | `"<arch>-<os>"` | 기본 호스트. 지원: `x86_64-linux`, `x86_64-windows`(PE 크로스 컴파일, 출력 `<이름>.exe`). 그 밖은 `E0715` |
 | `link` | `static` / `dynamic` | |
 | `std` | `none` / `default` | `none`이면 암묵 표준 라이브러리를 끈다(`--no-std`) |
 | `mode`, `optimization`, `bounds_check`, `debug_alloc`, `overflow_check` | `config`와 같음 | 이 타깃에서만 `config`를 덮어씀 |

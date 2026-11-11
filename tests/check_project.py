@@ -174,5 +174,20 @@ outside = os.path.join(W, "precious"); os.makedirs(outside); open(os.path.join(o
 os.symlink(outside, os.path.join(d, "build"))
 c7(["clean", d]); ok(os.path.exists(os.path.join(outside, "keep")), "clean must not follow a symlink out of the project")
 ok(c7(["clean", os.path.join(W, "nowhere")])[0] == 1, "clean without a build file fails")
+# Windows target (stage 7): the same project builds a PE executable next to the Linux one; the platform is part of the cache key
+if shutil.which("clang") and shutil.which("lld-link") and shutil.which("llvm-dlltool"):
+    wd = os.path.join(W, "winproj"); os.makedirs(wd + "/src")
+    shutil.copy(os.path.join(ROOT, "run", "hello.c7"), wd + "/src/main.c7")
+    open(wd + "/Cmake7109.txt", "w").write('project "W"\ntarget executable "app":\n    sources:\n        "src/main.c7"\n    platform "x86_64-windows"\ntarget executable "lapp":\n    sources:\n        "src/main.c7"\n')
+    rc, so, se = c7(["build", wd, "-j1"]); o = so + se
+    exe = open(wd + "/build/app.exe", "rb").read(4096) if os.path.exists(wd + "/build/app.exe") else b""
+    ok(rc == 0 and exe[:2] == b"MZ", f"windows target builds a PE: {o[-200:]}")
+    ok(open(wd + "/build/lapp", "rb").read(4) == b"\x7fELF", "linux target next to it is still ELF")
+    ok("PE executables" in open(wd + "/build/app.exe.mp7").read(), "map file says PE listings are unavailable")
+    cdir = os.path.join(W, "wincache")
+    for _ in range(2): r = subprocess.run([C7C, "build", wd, "-j1", "--verbose", "--cache-dir", cdir], capture_output=True, text=True)
+    ok(r.returncode == 0 and (r.stdout + r.stderr).count("cached") >= 2, "second build is fully cached: " + (r.stdout + r.stderr)[-300:])
+else:
+    print("SKIP windows target project test (needs clang, lld-link, llvm-dlltool)")
 print(f"project: {checks} checks, problems={bad}")
 sys.exit(1 if bad else 0)

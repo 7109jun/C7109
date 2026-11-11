@@ -90,6 +90,11 @@ std::string buildMapText(const MapFile& m) {
   o << "\n";
 
   bool ok = false;
+  if (m.platform == "x86_64-windows") {  // PE images are not described yet: say so instead of leaving the sections out
+    o << "\n[Sections]\n; unavailable: section listing for PE executables is not implemented yet\n";
+    o << "\n[Symbols]\n; unavailable: symbol listing for PE executables is not implemented yet\n";
+    return o.str();
+  }
   std::string sec = capture("readelf -SW " + shellQuote(m.outputFile), ok);
   o << "\n[Sections]\n";
   if (!ok) o << "; unavailable: readelf could not read " << m.outputPath << "\n";

@@ -16,7 +16,7 @@
 | 표준 라이브러리 | `stdlib/*.c7` (C7로 작성) — 현재 `core`(출력·panic·assert), `str`(Str 메서드·UTF-8 순회·`StrBuf`) |
 | 런타임 | `runtime/c7rt.c` — 부트스트랩용 C 글루(출력, panic, 서술자 조회). 최종적으로는 C7로 대체 예정 |
 | 테스트 | 110개(`make test`): 파서·골든 AST, 의미 분석(`tests/sema` pos/neg), 빌드·실행(`tests/run`, 프로그램마다 `-O0`/`-O2` + 디버그 할당자 + `--debug -fbounds-check` 재실행), 디버그 할당자 감지(`tests/dbg`), 오버플로·경계(`tests/chk`), 표준 라이브러리 `@test`(Debug·Release), 테스트 러너, 진단 코드 레지스트리, 전처리기(`tests/pp` 동결 출력 + gcc 대조) |
-| 대상 플랫폼 | **x86-64 Linux만**. Windows·AArch64·x86-32는 미착수 |
+| 대상 플랫폼 | **x86-64 Linux** + **x86-64 Windows(PE, 크로스 컴파일)**. AArch64·x86-32는 미착수 |
 | 외부 의존 | LLVM 18의 `llc`, `gcc`(링크용). 자체 링커는 6단계 예정이라 현재는 시스템 링커 사용 |
 
 ### 로드맵 진행표 (규격서 17장 기준)
@@ -30,7 +30,7 @@
 | 4 | 런타임 + 표준 라이브러리 기초 | 🟡 **진행 중** (§5 참조) |
 | 5 | 빌드 시스템·패키지(`Cmake7109.txt`, `.cset7`, `.cr7`, `.l7`) | 🟡 **기반 모듈 완료**(SHA-256·TOML·ZIP/DEFLATE·SemVer·`.l7`, 각각 독립 오라클로 검증). **남은 작업은 `CONTRIBUTING.md`** — 알려진 결함 B1(TOML 중첩 세그폴트) 포함 |
 | 6 | 자체 링커 (ELF x86-64) | ❌ 미착수 |
-| 7 | Windows x86-64 (COFF/PE/PDB) | ❌ 미착수 |
+| 7 | Windows x86-64 (COFF/PE/PDB) | 🟡 PE 실행 파일 생성·자립 런타임 완료, 실제 Windows CI에서 실행 검증(`docs/windows.md`). PDB·DLL import·PE 맵은 미착수 |
 | 8 | 표준 라이브러리 확장(OS, 파일, 네트워크, 스레드, 암호, 압축 …) | ❌ 미착수 |
 | 9 | 최적화·LTO·PGO·`@specialize`·`@multiversion` | ❌ 미착수 |
 | 10 / 11 | AArch64 / x86 32-bit | ❌ 미착수 |

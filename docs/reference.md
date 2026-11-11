@@ -25,7 +25,7 @@ c7c --version            # c7c 1.0.0-alpha.1 (ABI c7abi1)
 | `--depfile f` | 읽은 소스·헤더 목록 출력 |
 | `--no-std` | 암묵 표준 라이브러리 끔 |
 | `--lang=en\|ko`, `--diag-format=text\|json` | 진단 언어 / 형식 |
-| `--target=ARCH-OS`, `-ffreestanding` | 대상(지금은 `x86_64-linux`만 코드 생성) |
+| `--target=ARCH-OS`, `-ffreestanding` | 대상: `x86_64-linux`, `x86_64-windows`([Windows 대상](windows.md)). 그 밖은 `E0715` |
 
 환경 변수: `C7_STDLIB`(표준 라이브러리 소스 디렉터리), `C7_RUNTIME`(런타임 C 파일). 표준 라이브러리 탐색 순서는 `C7_STDLIB` > `std.l7` > `stdlib/`(실행 파일 옆).
 
@@ -255,5 +255,6 @@ i32 f(bool c) {
 ## 9. 로드맵과 한계
 
 - 완료: 프런트엔드, 의미 분석, C7 IR + LLVM 코드 생성(x86-64 Linux), 런타임·표준 라이브러리 기초, 빌드 시스템·패키지(5단계).
-- 예정: 자체 링커(6), Windows(7), 표준 라이브러리 확장(8), 최적화·LTO(9), AArch64(10)·x86-32(11), 1.0 안정화(12), 셀프 호스팅(13).
+- 진행: Windows(7) — x86-64 PE 크로스 컴파일 완료([windows.md](windows.md)), PDB·DLL 등 남음.
+- 예정: 자체 링커(6), 표준 라이브러리 확장(8), 최적화·LTO(9), AArch64(10)·x86-32(11), 1.0 안정화(12), 셀프 호스팅(13).
 - 알려진 한계: 이동 후 사용 추적 없음, 흐름 민감한 초기화 검사 없음, 정수 리터럴 상수 접기는 `+ - * <<`만. 자세한 목록은 `STATUS.md` §7·§4.

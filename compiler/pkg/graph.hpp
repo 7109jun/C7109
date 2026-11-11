@@ -9,7 +9,9 @@
 
 namespace c7pkg {
 
-constexpr const char* kSupportedPlatform = "x86_64-linux";
+constexpr const char* kSupportedPlatform = "x86_64-linux";  // the host (the compiler only runs on Linux)
+// Platforms a target may be built for. x86_64-windows produces a PE executable by cross-compilation (stage 7).
+inline bool isBuildablePlatform(const std::string& p) { return p == "x86_64-linux" || p == "x86_64-windows"; }
 
 struct GraphNode {
   std::string name;

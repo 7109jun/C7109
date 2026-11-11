@@ -76,7 +76,11 @@ error(P + T("a", extra='    output "same"\n') + T("b", extra='    output "same"\
 error(P + T("a", extra='    output "b.c7"\n') + T("b"), "E0707", "2:1", label="output equals a source", frag="source of `b`")
 error(P + T("app") + T("lib", kind="library", extra='    output "build/app"\n'), "E0707", "5:1", label="explicit output equals another default output", frag="`build/app`")
 error(P + T("a", extra='    platform "aarch64-linux"\n'), "E0715", "2:1", label="unsupported platform", frag="`aarch64-linux`")
-error(P + T("a", extra='    platform "x86_64-windows"\n'), "E0715", "2:1", label="unsupported OS", frag="host `x86_64-linux`")
+error(P + T("a", extra='    platform "x86_64-macos"\n'), "E0715", "2:1", label="unsupported OS", frag="host `x86_64-linux`")
+checks += 1
+rc, g, err = run(P + T("a", extra='    platform "x86_64-windows"\n') + T("l", kind="library"))
+n = {x["name"]: x for x in g["nodes"]}
+if rc != 0 or n["a"]["platform"] != "x86_64-windows" or n["a"]["output"] != "build/a.exe" or n["l"]["output"] != "build/l-0.0.0.l7": fail(f"windows target: {g}")
 checks += 1
 rc, g, err = run(P + T("a", extra='    platform "x86_64-linux"\n'), "--host", "aarch64-linux")
 if rc != 0 or g["host"] != "aarch64-linux" or g["nodes"][0]["platform"] != "x86_64-linux": fail(f"explicit target platform on another host (cross description): {g} {err[:100]}")

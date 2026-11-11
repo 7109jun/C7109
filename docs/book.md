@@ -4,7 +4,7 @@ C7109를 처음 배우는 사람을 위한 안내서다. 이 책의 코드 예�
 
 관련 문서: [C7109 by Example](by-example.md) · [표준 라이브러리 API](stdlib.md) · [Cmake7109.txt 빌드 시스템](build-system.md) · [The C7109 Reference](reference.md)
 
-> 현재 상태: 대상은 **x86-64 Linux**. 컴파일러(`c7c`)는 LLVM의 `llc`와 `gcc`(링크용)가 필요하다. 자체 링커(6단계)와 Windows(7단계)는 아직 없다.
+> 현재 상태: 대상은 **x86-64 Linux**와 **x86-64 Windows**(크로스 컴파일, [Windows 대상](windows.md)). 컴파일러(`c7c`)는 LLVM의 `llc`와 `gcc`(링크용, Windows 대상은 `clang`·`lld`)가 필요하다. 자체 링커(6단계)는 아직 없다.
 
 ---
 

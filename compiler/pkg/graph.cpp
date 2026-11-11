@@ -34,10 +34,10 @@ bool buildGraph(DiagEngine& d, const BuildFile& b, const std::string& outDir, co
     n.platform = t.platform ? *t.platform : host;
     if (t.output) n.output = *t.output;
     else {
-      std::string file = t.kind == BuildTarget::Executable ? t.name : t.name + "-" + ver + ".l7";
+      std::string file = t.kind == BuildTarget::Executable ? t.name + (n.platform == "x86_64-windows" ? ".exe" : "") : t.name + "-" + ver + ".l7";
       n.output = base == "." || base.empty() ? file : base + "/" + file;
     }
-    if (n.platform != kSupportedPlatform) { d.report("E0715", t.loc, {n.platform, host}); ok = false; }
+    if (!isBuildablePlatform(n.platform)) { d.report("E0715", t.loc, {n.platform, host}); ok = false; }
     for (size_t k = 0; k < t.depends.size(); k++) {
       auto f = byName.find(t.depends[k]);
       if (f == byName.end()) {
