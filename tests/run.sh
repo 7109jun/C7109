@@ -116,5 +116,23 @@ else
   skipped="$skipped python-checks(need python3>=3.11)"
 fi
 [ -z "$skipped" ] || echo "SKIPPED:$skipped"
+# Windows target (stage 7): every run/dbg program must cross-build to a PE32+ x86-64 executable. Execution is checked on a real
+# Windows machine by CI (tests/run_windows_suite.py); here we verify that the toolchain produces well-formed images.
+if command -v clang >/dev/null && command -v lld-link >/dev/null && command -v llvm-dlltool >/dev/null; then
+  if python3 tests/gen_windows_suite.py /tmp/c7t-wsuite >/tmp/c7t-wout 2>&1 && python3 - <<'PY'
+import glob, struct, sys
+n = 0
+for f in glob.glob("/tmp/c7t-wsuite/*.exe"):
+    b = open(f, "rb").read(4096)
+    pe = struct.unpack_from("<I", b, 0x3C)[0]
+    assert b[:2] == b"MZ" and b[pe:pe+4] == b"PE\0\0", f
+    machine, = struct.unpack_from("<H", b, pe + 4); magic, = struct.unpack_from("<H", b, pe + 24)
+    sub, = struct.unpack_from("<H", b, pe + 24 + 68)
+    assert machine == 0x8664 and magic == 0x20B and sub == 3, f  # AMD64, PE32+, console
+    n += 1
+assert n >= 50, n
+PY
+  then pass=$((pass+1)); else fail=$((fail+1)); echo "FAIL windows cross-build"; tail -5 /tmp/c7t-wout; fi
+else echo "SKIP windows cross-build (needs clang, lld-link, llvm-dlltool)"; fi
 echo "passed=$pass failed=$fail"
 [ $fail -eq 0 ]

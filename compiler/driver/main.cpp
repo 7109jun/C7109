@@ -78,6 +78,30 @@ static std::vector<NodeP> loadExtraUnits(DiagEngine& d, const PPOptions& po, con
 
 static bool isL7Path(const std::string& p) { return p.size() > 3 && p.compare(p.size() - 3, 3, ".l7") == 0; }
 
+// Windows x86-64 (stage 7): COFF object + freestanding runtime + generated import libraries -> PE executable with lld-link.
+// Needs clang (to compile runtime/c7rt_win.c), llvm-dlltool and lld-link; no Windows SDK, CRT or MSVC is involved.
+static bool runTool(const std::string& cmd, DiagEngine& d, int fid, const char* what) {
+  if (std::system((cmd + " 2>&1").c_str()) == 0) return true;
+  d.report("E0903", Loc{fid, 1, 1}, {what});
+  return false;
+}
+
+static bool linkWindowsExe(DiagEngine& d, int fid, const std::string& dir, const std::string& obj, const std::string& out) {
+  namespace fs = std::filesystem;
+  std::string exeDir = fs::read_symlink("/proc/self/exe").parent_path().string();
+  const char* rt = std::getenv("C7_RUNTIME_WIN");
+  std::string rtPath = rt ? rt : exeDir + "/runtime/c7rt_win.c";
+  auto writeDef = [&](const std::string& name, const std::string& body) { std::ofstream(dir + "/" + name + ".def") << body; };
+  writeDef("kernel32", "LIBRARY kernel32.dll\nEXPORTS\nGetStdHandle\nWriteFile\nExitProcess\nGetProcessHeap\nHeapAlloc\nHeapFree\nGetEnvironmentVariableA\nSetConsoleOutputCP\n");
+  writeDef("ucrtbase", "LIBRARY ucrtbase.dll\nEXPORTS\n__stdio_common_vsprintf\n");
+  for (const char* lib : {"kernel32", "ucrtbase"})
+    if (!runTool(std::string("llvm-dlltool -m i386:x86-64 -d ") + dir + "/" + lib + ".def -l " + dir + "/" + lib + ".lib", d, fid, "llvm-dlltool (import library)")) return false;
+  std::string rtObj = dir + "/c7rt_win.obj";
+  if (!runTool("clang --target=x86_64-pc-windows-msvc -ffreestanding -fno-builtin -fno-stack-protector -O1 -c " + rtPath + " -o " + rtObj, d, fid, "clang (Windows runtime)")) return false;
+  return runTool("lld-link /nologo /subsystem:console /entry:c7_start /nodefaultlib /manifest:no /out:" + out + " " + obj + " " + rtObj + " " + dir + "/kernel32.lib " + dir + "/ucrtbase.lib",
+                 d, fid, "lld-link (system linker; own linker arrives in stage 6)");
+}
+
 static void usage() {
   std::cerr << "usage: c7c <build|test|check|parse|lex|pp|ast> file.c7 [-Idir] [-DNAME[=V]] [--lang=en|ko]\n"
                "           [--diag-format=text|json] [--target=ARCH-OS] [-ffreestanding] [--debug] [-fdebug-alloc] [-fbounds-check]\n"
@@ -98,7 +122,7 @@ int main(int argc, char** argv) {
   bool json = false, keep = false, noStd = false, staticLink = false;
   std::optional<bool> overflowOverride;  // -foverflow-check / -fno-overflow-check (applied last: they beat --debug's implied check)
   CodegenOptions cg;
-  std::string outPath, emit = "exe", optLevel = "0";
+  std::string outPath, emit = "exe", optLevel = "0", targetGiven;
   DiagEngine d;
   for (int i = 2; i < argc; i++) {
     std::string a = argv[i];
@@ -111,7 +135,9 @@ int main(int argc, char** argv) {
       auto dash = t.find('-');
       std::string arch = t.substr(0, dash), os = dash == std::string::npos ? "linux" : t.substr(dash + 1);
       po.arch = (arch == "i686") ? "x86" : arch;
+      if (os == "win32" || os == "windows-msvc") os = "windows";
       po.os = os;
+      targetGiven = t;
     } else if (a == "-ffreestanding") po.freestanding = true;
     else if (a == "--debug") { po.debug = true; cg.overflowCheck = true; }
     else if (a == "-o" && i + 1 < argc) outPath = argv[++i];
@@ -173,6 +199,16 @@ int main(int argc, char** argv) {
       std::cout << t.loc.line << ":" << t.loc.col << " " << tkName(t.kind) << " " << t.text << "\n";
     }
   } else if (cmd == "build") {
+    const bool winTarget = po.arch == "x86_64" && po.os == "windows";
+    if (!(po.arch == "x86_64" && (po.os == "linux" || winTarget)) && emit != "ir") {
+      d.report("E0715", Loc{fid, 1, 1}, {po.arch + "-" + po.os, "x86_64-linux"});
+      d.print(json ? std::cout : std::cerr, json);
+      return 1;
+    }
+    if (isTest && winTarget) {
+      std::cerr << "c7c: `test` runs the test binary on this host and cannot run a Windows program here\n";
+      return 2;
+    }
     auto toks = preprocess(d, fid, po);
     auto ast = parse(d, std::move(toks));
     ir::Module mod;
@@ -181,6 +217,7 @@ int main(int argc, char** argv) {
     std::vector<Node*> unitsV{ast.get()};
     for (auto& u : lib) unitsV.push_back(u.get());
     if (d.errorCount() == 0 && analyze(d, unitsV, &mod, cg)) {
+      if (winTarget) mod.triple = "x86_64-pc-windows-msvc";
       auto errs = ir::verify(mod);
       for (auto& e : errs) d.report("E0902", Loc{fid, 1, 1}, {e});
       if (errs.empty()) {
@@ -189,14 +226,16 @@ int main(int argc, char** argv) {
         else {
           fs::path dir = fs::temp_directory_path() / ("c7c-" + std::to_string(::getpid()));
           fs::create_directories(dir);
-          std::string ll = (dir / "out.ll").string(), obj = (dir / "out.o").string();
+          std::string ll = (dir / "out.ll").string(), obj = (dir / (winTarget ? "out.obj" : "out.o")).string();
           { std::ofstream o(ll); ir::printModule(mod, o, false); }
           if (emit == "llvm") { std::ifstream i(ll); std::stringstream b; b << i.rdbuf(); if (outPath.empty()) std::cout << b.str(); else std::ofstream(outPath) << b.str(); }
           else {
-            std::string cmdl = "llc -O" + optLevel + " -filetype=obj -relocation-model=pic " + ll + " -o " + obj + " 2>&1";
+            std::string cmdl = "llc -O" + optLevel + " -filetype=obj " + (winTarget ? "" : "-relocation-model=pic ") + ll + " -o " + obj + " 2>&1";
             if (std::system(cmdl.c_str()) != 0) d.report("E0903", Loc{fid, 1, 1}, {"llc"});
             else if (emit == "obj") { fs::copy_file(obj, outPath.empty() ? "out.o" : outPath, fs::copy_options::overwrite_existing); }
-            else {
+            else if (winTarget) {
+              if (!linkWindowsExe(d, fid, dir.string(), obj, outPath.empty() ? "a.exe" : outPath)) {}
+            } else {
               std::string exeDir = fs::read_symlink("/proc/self/exe").parent_path().string();
               const char* rt = std::getenv("C7_RUNTIME");
               std::string rtPath = rt ? rt : exeDir + "/runtime/c7rt.c";

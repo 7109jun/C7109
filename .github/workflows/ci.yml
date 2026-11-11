@@ -19,7 +19,7 @@ jobs:
       - name: Install toolchain
         run: |
           sudo apt-get update
-          sudo apt-get install -y llvm gcc g++ make python3 unzip binutils
+          sudo apt-get install -y llvm clang lld gcc g++ make python3 unzip binutils
           llc --version | head -3
       - name: Build (warnings are errors in review; the tree builds with 0)
         run: make
@@ -29,6 +29,12 @@ jobs:
         run: make doccheck
       - name: Sanitizer sweep (ASan + UBSan) and fuzz
         run: make asan
+      - name: Cross-build the Windows test suite (PE executables)
+        run: python3 tests/gen_windows_suite.py windows-suite
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-suite
+          path: windows-suite
       - name: Package
         run: |
           set -e
@@ -36,7 +42,7 @@ jobs:
           dir=c7109-$ver-linux-x86_64
           mkdir -p "$dir/runtime" "$dir/docs"
           cp c7c std.l7 "$dir/"
-          cp runtime/c7rt.c "$dir/runtime/"
+          cp runtime/c7rt.c runtime/c7rt_win.c "$dir/runtime/"
           cp -r docs/*.md "$dir/docs/"
           cp README.md "$dir/" || true
           tar czf "$dir.tar.gz" "$dir"
@@ -88,6 +94,22 @@ jobs:
         with:
           name: c7109-windows-msys2
           path: c7109-windows-msys2.tar.gz
+
+  windows-run:
+    # Stage 7 verification: the PE programs that the Linux job cross-built are executed on a real Windows machine and
+    # their output, exit status and stderr are compared with the same expectations the Linux tests use.
+    name: Windows (run cross-built PE programs)
+    needs: linux
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-suite
+          path: windows-suite
+      - name: Run suite
+        shell: bash
+        run: python tests/run_windows_suite.py windows-suite
 
   release:
     name: Release assets
