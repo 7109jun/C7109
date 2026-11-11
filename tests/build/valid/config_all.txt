@@ -1,0 +1,10 @@
+project "C"
+config dev:
+    mode "debug"
+    optimization "O1"
+    bounds_check false
+    debug_alloc true
+    overflow_check true
+config bare:
+config fast-3:
+    optimization "O3"

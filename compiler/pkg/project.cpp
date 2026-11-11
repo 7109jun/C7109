@@ -121,18 +121,32 @@ struct Project {
   std::string lockPath, config;                    // lock file location; selected configuration name
 };
 
+// Spawns `argv` with `dir` as its working directory. glibc has posix_spawn_file_actions_addchdir_np; Cygwin/MSYS2 does not, so
+// there the (single-threaded) parent changes directory around the spawn instead.
+int spawnIn(pid_t* pid, const std::vector<std::string>& argvS, const std::string& dir, posix_spawn_file_actions_t* fa) {
+  std::vector<char*> av;
+  for (auto& a : argvS) av.push_back(const_cast<char*>(a.c_str()));
+  av.push_back(nullptr);
+#if defined(__CYGWIN__) || defined(__MSYS__)
+  char old[4096];
+  if (!getcwd(old, sizeof old) || chdir(dir.c_str()) != 0) return errno ? errno : 1;
+  int rc = posix_spawn(pid, argvS[0].c_str(), fa, nullptr, av.data(), environ);
+  if (chdir(old) != 0 && rc == 0) rc = errno;
+  return rc;
+#else
+  posix_spawn_file_actions_addchdir_np(fa, dir.c_str());
+  return posix_spawn(pid, argvS[0].c_str(), fa, nullptr, av.data(), environ);
+#endif
+}
+
 // Runs a child and waits for it (used for path-dependency sub-projects). Output goes to `log`.
 int runAndWait(const std::vector<std::string>& argv, const std::string& cwd, const std::string& log) {
   posix_spawn_file_actions_t fa;
   posix_spawn_file_actions_init(&fa);
   posix_spawn_file_actions_addopen(&fa, 1, log.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
   posix_spawn_file_actions_adddup2(&fa, 1, 2);
-  posix_spawn_file_actions_addchdir_np(&fa, cwd.c_str());
-  std::vector<char*> av;
-  for (auto& a : argv) av.push_back(const_cast<char*>(a.c_str()));
-  av.push_back(nullptr);
   pid_t pid;
-  int rc = posix_spawn(&pid, argv[0].c_str(), &fa, nullptr, av.data(), environ);
+  int rc = spawnIn(&pid, argv, cwd, &fa);
   posix_spawn_file_actions_destroy(&fa);
   if (rc != 0) return 127;
   int status = 0;
@@ -519,11 +533,7 @@ bool spawnJob(const Project& p, Job& j, const std::string& logPath) {
   posix_spawn_file_actions_init(&fa);
   posix_spawn_file_actions_addopen(&fa, 1, logPath.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
   posix_spawn_file_actions_adddup2(&fa, 1, 2);
-  posix_spawn_file_actions_addchdir_np(&fa, p.dir.c_str());
-  std::vector<char*> av;
-  for (auto& s : j.argv) av.push_back(const_cast<char*>(s.c_str()));
-  av.push_back(nullptr);
-  int rc = posix_spawn(&j.pid, j.argv[0].c_str(), &fa, nullptr, av.data(), environ);
+  int rc = spawnIn(&j.pid, j.argv, p.dir, &fa);
   posix_spawn_file_actions_destroy(&fa);
   return rc == 0;
 }

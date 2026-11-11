@@ -1,0 +1,36 @@
+# full example (guide 4.3 a)
+project "Example":
+    version "1.2.3"
+    license "GPL-3.0-only"
+    description "demo"
+
+registry "../registry"
+dependency "Other" "^1.2"
+dependency "Local" path "../local"
+
+config debug:
+    mode "debug"
+    optimization "O0"
+    bounds_check true
+    debug_alloc true
+config release:
+    mode "release"
+    optimization "O2"
+default_config release
+
+target library "mylib":
+    sources:
+        "src/lib.c7"
+target executable "app":
+    sources:
+        "src/main.c7"
+    include_dirs:
+        "include"
+    defines:
+        "VERSION=2"
+    depends:
+        "mylib"
+    output "build/app"
+    platform "x86_64-linux"
+    link "static"
+    std "none"

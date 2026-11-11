@@ -1,0 +1,6 @@
+project "P"
+target executable "a":
+    sources:
+        "./src//a.c7"
+        "src/../src/b.c7"
+        "x/./y/../z.c7"

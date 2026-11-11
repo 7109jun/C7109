@@ -1,0 +1,8 @@
+project "P"
+target executable "a":
+    sources:
+        "a.c7"
+    include_dirs:
+        "."
+        "inc/"
+        "a/../b"

@@ -1,0 +1,18 @@
+{
+ "configs": [],
+ "dependencies": [
+  {
+   "name": "L",
+   "path": "../../x/l.l7"
+  },
+  {
+   "name": "M",
+   "path": "/abs/m"
+  }
+ ],
+ "project": {
+  "name": "D"
+ },
+ "registries": [],
+ "targets": []
+}

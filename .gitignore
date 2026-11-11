@@ -4,6 +4,6 @@ std.l7
 std.l7.tmp
 stdlib/std.l7
 .c7cache/
-build/
+/build/
 *.o
 *.ll

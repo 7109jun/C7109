@@ -1,0 +1,4 @@
+project "Example"
+target executable "app":
+    sources:
+        "src/main.c7"

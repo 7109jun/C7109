@@ -1,0 +1,25 @@
+{
+ "configs": [
+  {
+   "bounds_check": false,
+   "debug_alloc": true,
+   "mode": "debug",
+   "name": "dev",
+   "optimization": "O1",
+   "overflow_check": true
+  },
+  {
+   "name": "bare"
+  },
+  {
+   "name": "fast-3",
+   "optimization": "O3"
+  }
+ ],
+ "dependencies": [],
+ "project": {
+  "name": "C"
+ },
+ "registries": [],
+ "targets": []
+}

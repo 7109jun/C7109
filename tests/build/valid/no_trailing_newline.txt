@@ -1,0 +1,4 @@
+project "X"
+target executable "a":
+    sources:
+        "a.c7"

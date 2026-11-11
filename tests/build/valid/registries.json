@@ -1,0 +1,13 @@
+{
+ "configs": [],
+ "dependencies": [],
+ "project": {
+  "name": "R"
+ },
+ "registries": [
+  "../one",
+  "/abs/two",
+  "three"
+ ],
+ "targets": []
+}

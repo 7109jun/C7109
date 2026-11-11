@@ -1,0 +1,4 @@
+project "Crlf"
+target executable "a":
+    sources:
+        "a.c7"

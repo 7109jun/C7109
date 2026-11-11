@@ -1,0 +1,9 @@
+project "D"
+target executable "a":
+    sources:
+        "a.c7"
+    defines:
+        "DEBUG"
+        "LEVEL=3"
+        "EMPTY="
+        "S=a=b"

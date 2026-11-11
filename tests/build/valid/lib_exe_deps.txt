@@ -1,0 +1,15 @@
+project "G"
+target library "core":
+    sources:
+        "core.c7"
+target library "util":
+    sources:
+        "util.c7"
+    depends:
+        "core"
+target executable "app":
+    sources:
+        "main.c7"
+    depends:
+        "util"
+        "core"

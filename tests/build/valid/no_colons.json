@@ -1,0 +1,26 @@
+{
+ "configs": [
+  {
+   "mode": "debug",
+   "name": "c"
+  }
+ ],
+ "dependencies": [],
+ "project": {
+  "name": "N",
+  "version": "0.1.0"
+ },
+ "registries": [],
+ "targets": [
+  {
+   "defines": [],
+   "depends": [],
+   "include_dirs": [],
+   "kind": "executable",
+   "name": "a",
+   "sources": [
+    "a.c7"
+   ]
+  }
+ ]
+}

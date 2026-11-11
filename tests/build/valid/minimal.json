@@ -1,0 +1,20 @@
+{
+ "configs": [],
+ "dependencies": [],
+ "project": {
+  "name": "Example"
+ },
+ "registries": [],
+ "targets": [
+  {
+   "defines": [],
+   "depends": [],
+   "include_dirs": [],
+   "kind": "executable",
+   "name": "app",
+   "sources": [
+    "src/main.c7"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,5 @@
+project "P"
+target executable "a":
+    sources:
+        "a.c7"
+    output "../out"

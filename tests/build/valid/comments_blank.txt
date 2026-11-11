@@ -1,0 +1,12 @@
+# header
+
+   
+# indented comment
+project "C" # trailing
+
+target executable "a": # why
+    # inside
+    sources:  # list
+        "a.c7" # one
+
+        "b#.c7"

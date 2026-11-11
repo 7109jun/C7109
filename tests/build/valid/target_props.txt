@@ -1,0 +1,8 @@
+project "T"
+target library "l":
+    sources:
+        "l.c7"
+    output "out/l.l7"
+    platform "x86_64-linux"
+    link "dynamic"
+    std "default"

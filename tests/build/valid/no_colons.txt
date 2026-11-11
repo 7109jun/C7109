@@ -1,0 +1,7 @@
+project "N"
+    version "0.1.0"
+config c
+    mode "debug"
+target executable "a"
+    sources:
+        "a.c7"

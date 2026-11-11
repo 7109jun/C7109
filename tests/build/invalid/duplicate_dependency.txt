@@ -1,0 +1,3 @@
+project "P"
+dependency "A" "1.0.0"
+dependency "A" "2.0.0"

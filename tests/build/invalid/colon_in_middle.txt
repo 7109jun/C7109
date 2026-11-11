@@ -1,0 +1,2 @@
+project "P"
+target executable : "a"

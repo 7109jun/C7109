@@ -1,0 +1,11 @@
+project "P"
+  x
+    x
+      x
+        x
+          x
+            x
+              x
+                x
+                  x
+                    x

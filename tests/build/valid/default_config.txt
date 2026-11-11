@@ -1,0 +1,6 @@
+project "C"
+default_config b
+config a:
+    mode "debug"
+config b:
+    mode "release"

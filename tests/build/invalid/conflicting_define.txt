@@ -1,0 +1,7 @@
+project "P"
+target executable "a":
+    sources:
+        "a.c7"
+    defines:
+        "N=1"
+        "N=2"

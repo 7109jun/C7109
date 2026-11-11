@@ -1,0 +1,4 @@
+project "P"
+target executable "a":
+    sources:
+        "nope/missing.c7"

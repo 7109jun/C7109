@@ -1,0 +1,7 @@
+project "P"
+target executable "a":
+    sources:
+        "a.c7"
+target library "a":
+    sources:
+        "b.c7"

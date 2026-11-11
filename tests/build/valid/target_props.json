@@ -1,0 +1,24 @@
+{
+ "configs": [],
+ "dependencies": [],
+ "project": {
+  "name": "T"
+ },
+ "registries": [],
+ "targets": [
+  {
+   "defines": [],
+   "depends": [],
+   "include_dirs": [],
+   "kind": "library",
+   "link": "dynamic",
+   "name": "l",
+   "output": "out/l.l7",
+   "platform": "x86_64-linux",
+   "sources": [
+    "l.c7"
+   ],
+   "std": "default"
+  }
+ ]
+}

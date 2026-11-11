@@ -1,0 +1,7 @@
+project "D"
+dependency "A" "^1.2"
+dependency "B" ">=1.0, <2.0"
+dependency "C" "1.*"
+dependency "D-x" "=1.2.3"
+dependency "E_y" "~1.4"
+dependency "F" "1.2.3"

@@ -1,0 +1,4 @@
+project "P"
+target executable "a":
+    sources:
+        "src/"

@@ -1,0 +1,22 @@
+{
+ "configs": [],
+ "dependencies": [],
+ "project": {
+  "name": "P"
+ },
+ "registries": [],
+ "targets": [
+  {
+   "defines": [],
+   "depends": [],
+   "include_dirs": [],
+   "kind": "executable",
+   "name": "a",
+   "sources": [
+    "src/a.c7",
+    "src/b.c7",
+    "x/z.c7"
+   ]
+  }
+ ]
+}

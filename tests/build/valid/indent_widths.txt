@@ -1,0 +1,7 @@
+project "I"
+target executable "a":
+  sources:
+          "a.c7"
+target executable "b":
+        sources:
+         "b.c7"

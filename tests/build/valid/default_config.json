@@ -1,0 +1,19 @@
+{
+ "configs": [
+  {
+   "mode": "debug",
+   "name": "a"
+  },
+  {
+   "mode": "release",
+   "name": "b"
+  }
+ ],
+ "default_config": "b",
+ "dependencies": [],
+ "project": {
+  "name": "C"
+ },
+ "registries": [],
+ "targets": []
+}

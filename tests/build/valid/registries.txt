@@ -1,0 +1,4 @@
+project "R"
+registry "../one"
+registry "/abs/two"
+registry "three"

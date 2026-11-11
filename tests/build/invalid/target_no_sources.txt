@@ -1,0 +1,3 @@
+project "P"
+target executable "a":
+    output "x"

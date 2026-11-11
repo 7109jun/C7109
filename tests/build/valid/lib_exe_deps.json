@@ -1,0 +1,45 @@
+{
+ "configs": [],
+ "dependencies": [],
+ "project": {
+  "name": "G"
+ },
+ "registries": [],
+ "targets": [
+  {
+   "defines": [],
+   "depends": [],
+   "include_dirs": [],
+   "kind": "library",
+   "name": "core",
+   "sources": [
+    "core.c7"
+   ]
+  },
+  {
+   "defines": [],
+   "depends": [
+    "core"
+   ],
+   "include_dirs": [],
+   "kind": "library",
+   "name": "util",
+   "sources": [
+    "util.c7"
+   ]
+  },
+  {
+   "defines": [],
+   "depends": [
+    "util",
+    "core"
+   ],
+   "include_dirs": [],
+   "kind": "executable",
+   "name": "app",
+   "sources": [
+    "main.c7"
+   ]
+  }
+ ]
+}

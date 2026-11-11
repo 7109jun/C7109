@@ -1,0 +1,68 @@
+{
+ "configs": [
+  {
+   "bounds_check": true,
+   "debug_alloc": true,
+   "mode": "debug",
+   "name": "debug",
+   "optimization": "O0"
+  },
+  {
+   "mode": "release",
+   "name": "release",
+   "optimization": "O2"
+  }
+ ],
+ "default_config": "release",
+ "dependencies": [
+  {
+   "name": "Other",
+   "version": "^1.2"
+  },
+  {
+   "name": "Local",
+   "path": "../local"
+  }
+ ],
+ "project": {
+  "description": "demo",
+  "license": "GPL-3.0-only",
+  "name": "Example",
+  "version": "1.2.3"
+ },
+ "registries": [
+  "../registry"
+ ],
+ "targets": [
+  {
+   "defines": [],
+   "depends": [],
+   "include_dirs": [],
+   "kind": "library",
+   "name": "mylib",
+   "sources": [
+    "src/lib.c7"
+   ]
+  },
+  {
+   "defines": [
+    "VERSION=2"
+   ],
+   "depends": [
+    "mylib"
+   ],
+   "include_dirs": [
+    "include"
+   ],
+   "kind": "executable",
+   "link": "static",
+   "name": "app",
+   "output": "build/app",
+   "platform": "x86_64-linux",
+   "sources": [
+    "src/main.c7"
+   ],
+   "std": "none"
+  }
+ ]
+}

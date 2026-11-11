@@ -1,0 +1,3 @@
+project "P"
+config c:
+    optimization "O9"

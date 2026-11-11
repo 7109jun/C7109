@@ -1,0 +1,5 @@
+project "예제 프로젝트":
+    description "한국어 설명 ✓"
+target executable "app":
+    sources:
+        "소스/메인.c7"

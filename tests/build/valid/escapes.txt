@@ -1,0 +1,5 @@
+project "E":
+    description "q\" b\\ n\n t\t"
+target executable "a":
+    sources:
+        "a.c7"

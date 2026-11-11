@@ -1,0 +1,4 @@
+project "P"
+target shared "a":
+    sources:
+        "a.c7"

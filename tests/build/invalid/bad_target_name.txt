@@ -1,0 +1,4 @@
+project "P"
+target executable "1app":
+    sources:
+        "a.c7"

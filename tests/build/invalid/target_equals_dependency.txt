@@ -1,0 +1,5 @@
+project "P"
+dependency "a" "1.0.0"
+target executable "a":
+    sources:
+        "a.c7"

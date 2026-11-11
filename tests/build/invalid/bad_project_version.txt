@@ -1,0 +1,2 @@
+project "P":
+    version "1.x.y"

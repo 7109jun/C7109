@@ -1,0 +1,5 @@
+project "Example"
+target executable "app":
+    sources:
+        "src/main.c7"
+        "src/math.c7"
