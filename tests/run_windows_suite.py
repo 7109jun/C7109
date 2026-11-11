@@ -9,6 +9,8 @@ RUNNER = shlex.split(os.environ.get("C7_RUNNER", ""))
 d = sys.argv[1]
 cases = json.load(open(os.path.join(d, "manifest.json")))
 bad = 0
+if RUNNER:  # an emulator's first start creates its prefix and can fail the first program: warm it up, ignoring the result
+    subprocess.run([*RUNNER, os.path.join(d, cases[0]["exe"])], capture_output=True, timeout=300)
 def norm(b): return b.replace(b"\r\n", b"\n").rstrip(b"\n")
 for c in cases:
     try:
@@ -18,7 +20,7 @@ for c in cases:
     exp = c["expected"].encode("utf-8", "surrogateescape")
     why = []
     if norm(p.stdout) != norm(exp): why.append(f"stdout differs\n--- expected\n{exp!r}\n--- got\n{p.stdout!r}")
-    if p.returncode != c["rc"]: why.append(f"exit status {p.returncode}, want {c['rc']}")
+    if p.returncode != c["rc"]: why.append(f"exit status {p.returncode}, want {c['rc']}; stderr={p.stderr[:300]!r}")
     s = c.get("stderr_contains")
     if s and s.encode("utf-8", "surrogateescape") not in p.stderr: why.append(f"stderr lacks {s!r}: {p.stderr!r}")
     if why: bad += 1; print("FAIL", c["name"], *why)
