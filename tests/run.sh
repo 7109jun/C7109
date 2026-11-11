@@ -135,7 +135,7 @@ PY
   then pass=$((pass+1)); else fail=$((fail+1)); echo "FAIL windows cross-build"; tail -5 /tmp/c7t-wout; fi
   # With Wine installed the cross-built programs are also executed here (output, exit status and stderr are compared).
   if command -v wine >/dev/null; then
-    export WINEPREFIX=/tmp/c7t-wineprefix; wineboot -i >/dev/null 2>&1; if WINEDEBUG=-all C7_RUNNER=wine python3 tests/run_windows_suite.py /tmp/c7t-wsuite >/tmp/c7t-wrun 2>&1; then pass=$((pass+1)); else fail=$((fail+1)); echo "FAIL windows programs under wine"; head -20 /tmp/c7t-wrun; fi
+    export WINEPREFIX="${HOME:-/root}/.c7t-wineprefix"; wineboot -i >/dev/null 2>&1; if WINEDEBUG=-all C7_RUNNER=wine python3 tests/run_windows_suite.py /tmp/c7t-wsuite >/tmp/c7t-wrun 2>&1; then pass=$((pass+1)); else fail=$((fail+1)); echo "FAIL windows programs under wine"; head -20 /tmp/c7t-wrun; fi
   else echo "SKIP running Windows programs (install wine to execute them here; CI runs them on a real Windows runner)"; fi
 else echo "SKIP windows cross-build (needs clang, lld-link, llvm-dlltool)"; fi
 echo "passed=$pass failed=$fail"
